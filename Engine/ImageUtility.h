@@ -3,12 +3,10 @@
 #include <filesystem>
 #include <vector>
 
-#include <Common/Types.h>
+#include <Engine/Common/Types.h>
 
-namespace engine
+namespace hyperion
 {
-	using namespace common;
-
 	class ImageUtility
 	{
 	public:

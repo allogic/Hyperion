@@ -1,23 +1,16 @@
-#include <Common/Macros.h>
-#include <Common/Types.h>
-#include <Common/Config.h>
-
 #include <Engine/Scene.h>
-#include <Engine/Entity.h>
-#include <Engine/FontAtlas.h>
 
-#include <Engine/Actors/Test.h>
+#include <Engine/Common/Types.h>
+#include <Engine/Common/Config.h>
 
-#include <Interface/LayoutParser.h>
-#include <Interface/Node.h>
+#include <Engine/Interface/FontAtlas.h>
+#include <Engine/Interface/LayoutParser.h>
+#include <Engine/Interface/Node.h>
 
-#include <Vulkan/Window.h>
-#include <Vulkan/Renderer.h>
+#include <Engine/Vulkan/Window.h>
+#include <Engine/Vulkan/Renderer.h>
 
-using namespace common;
-using namespace engine;
-using namespace interface;
-using namespace vulkan;
+using namespace hyperion;
 
 I32 main()
 {

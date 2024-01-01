@@ -1,12 +1,12 @@
 #include <Engine/ImageUtility.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <Vendor/stbimage/stb_image.h>
+#include <Engine/Stbimage/stb_image.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <Vendor/stbimage/stb_image_write.h>
+#include <Engine/Stbimage/stb_image_write.h>
 
-namespace engine
+namespace hyperion
 {
 	std::vector<U8> ImageUtility::ReadPng(std::filesystem::path const& File)
 	{

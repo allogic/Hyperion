@@ -4,7 +4,7 @@
 
 namespace automation
 {
-	using namespace engine;
+	using namespace hyperion;
 
 	class Game : public Scene
 	{

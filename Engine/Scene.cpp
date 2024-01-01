@@ -1,12 +1,12 @@
-#include <Common/Macros.h>
+#include <Engine/Common/Macros.h>
 
 #include <Engine/Scene.h>
 
-#include <Engine/Actors/Player.h>
+#include <Engine/Ecs/Actors/Player.h>
 
-#include <Engine/Components/Camera.h>
+#include <Engine/Ecs/Components/Camera.h>
 
-namespace engine
+namespace hyperion
 {
 	Scene::Scene()
 	{

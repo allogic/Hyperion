@@ -1,6 +1,6 @@
 #include <Engine/Math/Math.h>
 
-namespace engine
+namespace hyperion
 {
 	R32 Math::Remap(R32 Value, R32 FromLow, R32 FromHigh, R32 ToLow, R32 ToHigh)
 	{

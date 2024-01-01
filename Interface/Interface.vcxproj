@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,6 +140,62 @@
     <ClInclude Include="Components\Histogram.h" />
     <ClInclude Include="Components\StackPanel.h" />
     <ClInclude Include="Components\Text.h" />
+    <ClInclude Include="FontAtlas.h" />
+    <ClInclude Include="FreeType\freetype\config\ftconfig.h" />
+    <ClInclude Include="FreeType\freetype\config\ftheader.h" />
+    <ClInclude Include="FreeType\freetype\config\ftmodule.h" />
+    <ClInclude Include="FreeType\freetype\config\ftoption.h" />
+    <ClInclude Include="FreeType\freetype\config\ftstdlib.h" />
+    <ClInclude Include="FreeType\freetype\config\integer-types.h" />
+    <ClInclude Include="FreeType\freetype\config\mac-support.h" />
+    <ClInclude Include="FreeType\freetype\config\public-macros.h" />
+    <ClInclude Include="FreeType\freetype\freetype.h" />
+    <ClInclude Include="FreeType\freetype\ftadvanc.h" />
+    <ClInclude Include="FreeType\freetype\ftbbox.h" />
+    <ClInclude Include="FreeType\freetype\ftbdf.h" />
+    <ClInclude Include="FreeType\freetype\ftbitmap.h" />
+    <ClInclude Include="FreeType\freetype\ftbzip2.h" />
+    <ClInclude Include="FreeType\freetype\ftcache.h" />
+    <ClInclude Include="FreeType\freetype\ftchapters.h" />
+    <ClInclude Include="FreeType\freetype\ftcid.h" />
+    <ClInclude Include="FreeType\freetype\ftcolor.h" />
+    <ClInclude Include="FreeType\freetype\ftdriver.h" />
+    <ClInclude Include="FreeType\freetype\fterrdef.h" />
+    <ClInclude Include="FreeType\freetype\fterrors.h" />
+    <ClInclude Include="FreeType\freetype\ftfntfmt.h" />
+    <ClInclude Include="FreeType\freetype\ftgasp.h" />
+    <ClInclude Include="FreeType\freetype\ftglyph.h" />
+    <ClInclude Include="FreeType\freetype\ftgxval.h" />
+    <ClInclude Include="FreeType\freetype\ftgzip.h" />
+    <ClInclude Include="FreeType\freetype\ftimage.h" />
+    <ClInclude Include="FreeType\freetype\ftincrem.h" />
+    <ClInclude Include="FreeType\freetype\ftlcdfil.h" />
+    <ClInclude Include="FreeType\freetype\ftlist.h" />
+    <ClInclude Include="FreeType\freetype\ftlogging.h" />
+    <ClInclude Include="FreeType\freetype\ftlzw.h" />
+    <ClInclude Include="FreeType\freetype\ftmac.h" />
+    <ClInclude Include="FreeType\freetype\ftmm.h" />
+    <ClInclude Include="FreeType\freetype\ftmodapi.h" />
+    <ClInclude Include="FreeType\freetype\ftmoderr.h" />
+    <ClInclude Include="FreeType\freetype\ftotval.h" />
+    <ClInclude Include="FreeType\freetype\ftoutln.h" />
+    <ClInclude Include="FreeType\freetype\ftparams.h" />
+    <ClInclude Include="FreeType\freetype\ftpfr.h" />
+    <ClInclude Include="FreeType\freetype\ftrender.h" />
+    <ClInclude Include="FreeType\freetype\ftsizes.h" />
+    <ClInclude Include="FreeType\freetype\ftsnames.h" />
+    <ClInclude Include="FreeType\freetype\ftstroke.h" />
+    <ClInclude Include="FreeType\freetype\ftsynth.h" />
+    <ClInclude Include="FreeType\freetype\ftsystem.h" />
+    <ClInclude Include="FreeType\freetype\fttrigon.h" />
+    <ClInclude Include="FreeType\freetype\fttypes.h" />
+    <ClInclude Include="FreeType\freetype\ftwinfnt.h" />
+    <ClInclude Include="FreeType\freetype\otsvg.h" />
+    <ClInclude Include="FreeType\freetype\t1tables.h" />
+    <ClInclude Include="FreeType\freetype\ttnameid.h" />
+    <ClInclude Include="FreeType\freetype\tttables.h" />
+    <ClInclude Include="FreeType\freetype\tttags.h" />
+    <ClInclude Include="FreeType\ft2build.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Forward.h" />
     <ClInclude Include="LayoutParser.h" />
@@ -151,6 +207,7 @@
     <ClCompile Include="Components\Histogram.cpp" />
     <ClCompile Include="Components\StackPanel.cpp" />
     <ClCompile Include="Components\Text.cpp" />
+    <ClCompile Include="FontAtlas.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="LayoutParser.cpp" />
     <ClCompile Include="Xml\tinyxml2.cpp" />

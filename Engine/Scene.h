@@ -4,23 +4,25 @@
 #include <vector>
 #include <map>
 
-#include <Common/Types.h>
-
 #include <Engine/Forward.h>
-#include <Engine/Entity.h>
-#include <Engine/Transform.h>
-#include <Engine/TransformHierarchy.h>
 
-#include <Vulkan/Forward.h>
-#include <Vulkan/Buffer.h>
-#include <Vulkan/Renderer.h>
+#include <Engine/Common/Types.h>
 
-#include <Vendor/vulkan/vulkan.h>
+#include <Engine/Ecs/Entity.h>
+#include <Engine/Ecs/Transform.h>
+#include <Engine/Ecs/TransformHierarchy.h>
 
-namespace engine
+#include <Engine/Vulkan/Buffer.h>
+#include <Engine/Vulkan/Renderer.h>
+
+namespace hyperion
 {
-	using namespace common;
-	using namespace vulkan;
+	constexpr R32V3 WorldRight = { 1.0F, 0.0F, 0.0F };
+	constexpr R32V3 WorldLeft = { -1.0F, 0.0F, 0.0F };
+	constexpr R32V3 WorldUp = { 0.0F, 1.0F, 0.0F };
+	constexpr R32V3 WorldDown = { 0.0F, -1.0F, 0.0F };
+	constexpr R32V3 WorldFront = { 0.0F, 0.0F, 1.0F };
+	constexpr R32V3 WorldBack = { 0.0F, 0.0F, -1.0F };
 
 	class Scene
 	{
@@ -78,7 +80,7 @@ namespace engine
 	};
 }
 
-namespace engine
+namespace hyperion
 {
 	template<typename E, typename ... Argument>
 	E* Scene::CreateEntity(std::string const& Name, Entity* Parent, Argument&&... Arg)

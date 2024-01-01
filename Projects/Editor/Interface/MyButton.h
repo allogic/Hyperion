@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Interface/Components/Button.h>
+#include <Engine/Interface/Nodes/Button.h>
 
 namespace editor
 {
-	using namespace interface;
+	using namespace hyperion;
 
 	class MyButton : public Button
 	{
