@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{250576fd-69d6-42f5-b3b3-90c2983ee331}</ProjectGuid>
-    <RootNamespace>Editor</RootNamespace>
+    <ProjectGuid>{aa33c444-eb0f-416f-9046-079d291bd6de}</ProjectGuid>
+    <RootNamespace>Automation</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,11 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(SolutionDir)Projects;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(IntDir);$(SolutionDir)Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)Vendor;$(SolutionDir)Projects;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(IntDir);$(SolutionDir)Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -139,11 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Interface\MyButton.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Scenes\Game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Interface\MyButton.h" />
+    <ClInclude Include="Scenes\Game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

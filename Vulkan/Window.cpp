@@ -555,7 +555,7 @@ namespace vulkan
 			}
 		}
 
-		LOG("Queue indices:\n");
+		LOG("Queue indices\n");
 		LOG("  GraphicAndComputeQueueIndex %d\n", mGraphicAndComputeQueueIndex);
 		LOG("  PresentQueueIndex %d\n", mPresentQueueIndex);
 		LOG("\n");
@@ -571,7 +571,7 @@ namespace vulkan
 
 		VK_CHECK(vkEnumerateDeviceExtensionProperties(mPhysicalDevice, 0, &availableDeviceExtensionCount, availableDeviceExtensions.data()));
 
-		LOG("Device extensions:\n");
+		LOG("Device extensions\n");
 
 		for (U32 i = 0; i < (U32)sDeviceExtensions.size(); ++i)
 		{

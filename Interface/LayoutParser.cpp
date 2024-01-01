@@ -1,7 +1,5 @@
 #include <Common/Macros.h>
 
-#include <Engine/Scene.h>
-
 #include <Interface/LayoutParser.h>
 #include <Interface/Node.h>
 
@@ -17,7 +15,7 @@ namespace interface
 {
 	std::map<std::string_view, NodeInfo> gNodeDeclarations = {};
 
-	Node* LayoutParser::Parse(Scene* Scene, std::filesystem::path const& File)
+	Node* LayoutParser::Parse(std::filesystem::path const& File)
 	{
 		XMLDocument document = {};
 
@@ -27,13 +25,13 @@ namespace interface
 		{
 			XMLElement* element = document.FirstChildElement();
 
-			return ParseRecursive(element, Scene, 0, 0.0F);
+			return ParseRecursive(element, 0, 0.0F);
 		}
 
 		return 0;
 	}
 
-	Node* LayoutParser::ParseRecursive(XMLElement* Element, Scene* Scene, Node* Parent, R32 Depth)
+	Node* LayoutParser::ParseRecursive(XMLElement* Element, Node* Parent, R32 Depth)
 	{
 		Node* node = 0;
 
@@ -175,7 +173,7 @@ namespace interface
 
 		for (XMLElement* child = Element->FirstChildElement(); child; child = child->NextSiblingElement())
 		{
-			ParseRecursive(child, Scene, node, Depth + 0.01F);
+			ParseRecursive(child, node, Depth + 0.01F);
 		}
 
 		return node;

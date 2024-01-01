@@ -1,3 +1,3 @@
 #pragma once
 
-#define SOURCE_PATH "C:\\Data\\VisualStudio\\Hyperion\\"
+#define ROOT_PATH "C:\\Users\\mialb\\Downloads\\Hyperion\\"

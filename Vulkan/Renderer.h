@@ -187,8 +187,8 @@ namespace vulkan
 		U32 mTextVertexCount = 0;
 		U32 mTextIndexCount = 0;
 
-		std::string mTextVertexFile = SOURCE_PATH "Engine\\Shaders\\Text.vert.spv";
-		std::string mTextFragmentFile = SOURCE_PATH "Engine\\Shaders\\Text.frag.spv";
+		std::string mTextVertexFile = ROOT_PATH "Engine\\Shaders\\Text.vert.spv";
+		std::string mTextFragmentFile = ROOT_PATH "Engine\\Shaders\\Text.frag.spv";
 
 		std::vector<VkDescriptorSetLayoutBinding> mTextDescriptorSetLayoutBindings =
 		{
@@ -235,8 +235,8 @@ namespace vulkan
 		U32 mInterfaceVertexCount = 0;
 		U32 mInterfaceIndexCount = 0;
 
-		std::string mInterfaceVertexFile = SOURCE_PATH "Engine\\Shaders\\Interface.vert.spv";
-		std::string mInterfaceFragmentFile = SOURCE_PATH "Engine\\Shaders\\Interface.frag.spv";
+		std::string mInterfaceVertexFile = ROOT_PATH "Engine\\Shaders\\Interface.vert.spv";
+		std::string mInterfaceFragmentFile = ROOT_PATH "Engine\\Shaders\\Interface.frag.spv";
 
 		std::vector<VkDescriptorSetLayoutBinding> mInterfaceDescriptorSetLayoutBindings =
 		{
@@ -278,8 +278,8 @@ namespace vulkan
 		U32 mDebugVertexCount = 0;
 		U32 mDebugIndexCount = 0;
 
-		std::string mDebugVertexFile = SOURCE_PATH "Engine\\Shaders\\Debug.vert.spv";
-		std::string mDebugFragmentFile = SOURCE_PATH "Engine\\Shaders\\Debug.frag.spv";
+		std::string mDebugVertexFile = ROOT_PATH "Engine\\Shaders\\Debug.vert.spv";
+		std::string mDebugFragmentFile = ROOT_PATH "Engine\\Shaders\\Debug.frag.spv";
 
 		std::vector<VkDescriptorSetLayoutBinding> mDebugDescriptorSetLayoutBindings =
 		{

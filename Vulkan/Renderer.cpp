@@ -621,7 +621,10 @@ namespace vulkan
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 2);
 #endif
 
-		Scene->DispatchTransformHierarchy();
+		if (Scene)
+		{
+			Scene->DispatchTransformHierarchy();
+		}
 
 #ifndef NDEBUG
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 3);
@@ -741,11 +744,11 @@ namespace vulkan
 
 		R32 timestampPeriod = gWindow->GetPhysicalDeviceProperties().limits.timestampPeriod;
 
-		R32 graphicElapsedTimeNanoSeconds = (queryResults[1] - queryResults[0]) * timestampPeriod;
-		R32 computeElapsedTimeNanoSeconds = (queryResults[3] - queryResults[2]) * timestampPeriod;
+		R32 graphicElapsedTimeMicroSeconds = (queryResults[1] - queryResults[0]) * timestampPeriod / 1000.0F;
+		R32 computeElapsedTimeMicroSeconds = (queryResults[3] - queryResults[2]) * timestampPeriod / 1000.0F;
 
-		ValueDatabase::SetValue("graphicTime", (R32)graphicElapsedTimeNanoSeconds);
-		ValueDatabase::SetValue("computeTime", (R32)computeElapsedTimeNanoSeconds);
+		ValueDatabase::SetValue("graphicTime", (R32)graphicElapsedTimeMicroSeconds);
+		ValueDatabase::SetValue("computeTime", (R32)computeElapsedTimeMicroSeconds);
 #endif
 
 		gRenderer->mTextVertexCount = 0;

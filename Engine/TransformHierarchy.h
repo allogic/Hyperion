@@ -73,7 +73,7 @@ namespace engine
 
 	private:
 
-		std::string mComputeFile = SOURCE_PATH "Engine\\Shaders\\Transform.comp.spv";
+		std::string mComputeFile = ROOT_PATH "Engine\\Shaders\\Transform.comp.spv";
 
 		VkDescriptorSetLayout mDescriptorSetLayout = 0;
 

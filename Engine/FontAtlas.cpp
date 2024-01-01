@@ -94,7 +94,7 @@ namespace engine
 
 				sFontIndex++;
 
-				//ImageUtility::WritePng(sAtlasWidth, sAtlasHeight, sAtlas, SOURCE_PATH "Atlas.png"); // TODO
+				//ImageUtility::WritePng(sAtlasWidth, sAtlasHeight, sAtlas, ROOT_PATH "Atlas.png"); // TODO
 
 				FT_Done_Face(face);
 			}

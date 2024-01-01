@@ -1,10 +1,6 @@
-#include <vector>
-
 #include <Common/Macros.h>
 #include <Common/Types.h>
 #include <Common/Config.h>
-
-#include <Editor/Interface/MyButton.h>
 
 #include <Engine/Scene.h>
 #include <Engine/Entity.h>
@@ -18,6 +14,8 @@
 #include <Vulkan/Window.h>
 #include <Vulkan/Renderer.h>
 
+#include <Editor/Interface/MyButton.h>
+
 using namespace common;
 using namespace editor;
 using namespace engine;
@@ -27,6 +25,13 @@ using namespace vulkan;
 I32 main()
 {
 	Window::Create("Editor", 1920, 1080);
+
+	FontAtlas::Load(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
+	FontAtlas::Load(ROOT_PATH "Engine\\Fonts\\Sagan.ttf");
+
+	LayoutParser::Register<MyButton>();
+
+	Node* layout = LayoutParser::Parse(ROOT_PATH "Projects\\Editor\\Interface\\Main.xml");
 
 	Scene* scene = new Scene;
 
@@ -60,16 +65,9 @@ I32 main()
 		}
 	}
 
-	FontAtlas::Load(SOURCE_PATH "Engine\\Fonts\\ProggyClean.ttf");
-	FontAtlas::Load(SOURCE_PATH "Engine\\Fonts\\Sagan.ttf");
-
-	LayoutParser::Register<MyButton>();
-
-	Node* layout = LayoutParser::Parse(scene, SOURCE_PATH "Editor\\Interface\\Main.xml");
-
-	//root->PrintHierarchy();
-	//layout->PrintHierarchy();
-	//scene->PrintHierarchy();
+	root->PrintHierarchy();
+	scene->PrintHierarchy();
+	layout->PrintHierarchy();
 
 	while (!Window::ShouldClose())
 	{
@@ -96,8 +94,8 @@ I32 main()
 		Window::PollEvents();
 	}
 	
-	delete layout;
 	delete scene;
+	delete layout;
 
 	Window::Destroy();
 

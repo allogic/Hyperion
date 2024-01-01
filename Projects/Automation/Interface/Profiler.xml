@@ -1,0 +1,107 @@
+<Root>	
+	<Histogram
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="20"
+		Width="300"
+		Height="30"
+		TimeSteps="100"
+		Interval="10"
+		Value="fps"
+		Scale="1000.0"
+		Id="fpsHistogram">
+	</Histogram>
+	<Text
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="60"
+		Orientation="Horizontal"
+		Width="300"
+		Height="10"
+		Font="ProggyClean"
+		FontSize="1.0"
+		Text="%g Fps"
+		Alignment="Center"
+		Value="fpsHistogram:avg">
+	</Text>
+	
+	<Histogram
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="80"
+		Width="300"
+		Height="30"
+		TimeSteps="100"
+		Interval="10"
+		Value="deltaTime"
+		Scale="1.0"
+		Id="deltaTimeHistogram">
+	</Histogram>
+	<StackPanel
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="120"
+		Orientation="Horizontal"
+		Width="300"
+		Height="10">
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f ms" Alignment="Left" Value="deltaTimeHistogram:min"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="DeltaTime" Alignment="Center"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f ms" Alignment="Right" Value="deltaTimeHistogram:max"></Text>
+	</StackPanel>
+
+	<Histogram
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="140"
+		Width="300"
+		Height="30"
+		TimeSteps="100"
+		Interval="10"
+		Value="graphicTime"
+		Scale="1.0"
+		Id="graphicTime">
+	</Histogram>
+	<StackPanel
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="180"
+		Orientation="Horizontal"
+		Width="300"
+		Height="10">
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f us" Alignment="Left" Value="graphicTime:min"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="Graphic" Alignment="Center"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f us" Alignment="Right" Value="graphicTime:max"></Text>
+	</StackPanel>
+
+	<Histogram
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="200"
+		Width="300"
+		Height="30"
+		TimeSteps="100"
+		Interval="10"
+		Value="computeTime"
+		Scale="1.0"
+		Id="computeTime">
+	</Histogram>
+	<StackPanel
+		HorizontalAlignment="Left"
+		VerticalAlignment="Top"
+		HorizontalOffset="20"
+		VerticalOffset="240"
+		Orientation="Horizontal"
+		Width="300"
+		Height="10">
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f us" Alignment="Left" Value="computeTime:min"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="Compute" Alignment="Center"></Text>
+		<Text Font="ProggyClean" FontSize="1.0" Text="%.3f us" Alignment="Right" Value="computeTime:max"></Text>
+	</StackPanel>
+</Root>

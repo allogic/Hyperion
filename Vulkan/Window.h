@@ -15,8 +15,6 @@ namespace vulkan
 {
 	using namespace common;
 
-	extern Window* gWindow;
-
 	namespace KeyCode
 	{
 		enum Type
@@ -63,6 +61,8 @@ namespace vulkan
 			LeftCtrl = 0xA2,
 		};
 	}
+
+	extern Window* gWindow;
 
 	class Window
 	{

@@ -26,7 +26,6 @@ public: \
 namespace interface
 {
 	using namespace common;
-	using namespace engine;
 	using namespace vulkan;
 	using namespace tinyxml2;
 
@@ -49,11 +48,11 @@ namespace interface
 
 	public:
 
-		static Node* Parse(Scene* Scene, std::filesystem::path const& File);
+		static Node* Parse(std::filesystem::path const& File);
 
 	private:
 
-		static Node* ParseRecursive(XMLElement* Element, Scene* Scene, Node* Parent, R32 Depth);
+		static Node* ParseRecursive(XMLElement* Element, Node* Parent, R32 Depth);
 
 	private:
 
