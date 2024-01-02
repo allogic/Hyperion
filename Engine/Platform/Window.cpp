@@ -1,8 +1,10 @@
 #include <Engine/Common/Macros.h>
 #include <Engine/Common/ValueDatabase.h>
 
-#include <Engine/Vulkan/Window.h>
-#include <Engine/Vulkan/Renderer.h>
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
+
 #include <Engine/Vulkan/Image.h>
 #include <Engine/Vulkan/ImageVariance.h>
 
@@ -23,7 +25,7 @@ namespace hyperion
 	{
 		"VK_KHR_surface",
 		"VK_KHR_win32_surface",
-#ifndef NDEBUG
+#ifdef NDEBUG
 		"VK_EXT_debug_utils",
 #endif
 	};
@@ -33,7 +35,7 @@ namespace hyperion
 		"VK_KHR_swapchain",
 	};
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 	static std::vector<char const*> sValidationLayers =
 	{
 		"VK_LAYER_KHRONOS_validation",
@@ -463,7 +465,7 @@ namespace hyperion
 		instanceCreateInfo.enabledExtensionCount = (U32)sLayerExtensions.size();
 		instanceCreateInfo.ppEnabledExtensionNames = sLayerExtensions.data();
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
 		debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
@@ -477,7 +479,7 @@ namespace hyperion
 
 		VK_CHECK(vkCreateInstance(&instanceCreateInfo, 0, &mInstance));
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		CreateDebugUtilsMessengerEXT(mInstance, &debugCreateInfo, 0, &mDebugMessenger);
 #endif
 	}
@@ -627,7 +629,7 @@ namespace hyperion
 		deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 		deviceCreateInfo.ppEnabledExtensionNames = sDeviceExtensions.data();
 		deviceCreateInfo.enabledExtensionCount = (U32)sDeviceExtensions.size();
-#ifndef NDEBUG
+#ifdef NDEBUG
 		deviceCreateInfo.ppEnabledLayerNames = sValidationLayers.data();
 		deviceCreateInfo.enabledLayerCount = (U32)sValidationLayers.size();
 #endif
@@ -754,7 +756,7 @@ namespace hyperion
 
 	void Window::DestroyInstance()
 	{
-#ifndef NDEBUG
+#ifdef NDEBUG
 		DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, 0);
 #endif
 
@@ -872,7 +874,7 @@ namespace hyperion
 		return FindSupportedFormat(formats, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 	}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 	VkResult Window::CreateDebugUtilsMessengerEXT(VkInstance Instance, const VkDebugUtilsMessengerCreateInfoEXT* DebugCreateInfo, const VkAllocationCallbacks* Allocator, VkDebugUtilsMessengerEXT* Messenger)
 	{
 		PFN_vkCreateDebugUtilsMessengerEXT createDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT");

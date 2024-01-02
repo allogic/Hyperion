@@ -6,8 +6,9 @@
 
 #include <Engine/Ecs/Components/Camera.h>
 
-#include <Engine/Vulkan/Window.h>
-#include <Engine/Vulkan/Renderer.h>
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
 
 namespace hyperion
 {
@@ -25,11 +26,6 @@ namespace hyperion
 	void Test::Update()
 	{
 		mAngle += 6.0F * Window::GetDeltaTime();
-
-		if (mAngle >= 360.0F)
-		{
-			mAngle = 0.0F;
-		}
 
 		mTransform->LocalEulerAngles.z = glm::sin(mAngle) * 2.0F;
 

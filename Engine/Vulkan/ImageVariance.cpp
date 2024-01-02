@@ -5,7 +5,7 @@
 
 namespace hyperion
 {
-	Image* ImageVariance::CreateRImage2D(U32 Width, U32 Height, void* Data)
+	Image* ImageVariance::CreateRImage2D(void* Data, U32 Width, U32 Height)
 	{
 		Buffer stagingBuffer = { Width * Height * 1, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -26,7 +26,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgImage2D(U32 Width, U32 Height, void* Data)
+	Image* ImageVariance::CreateRgImage2D(void* Data, U32 Width, U32 Height)
 	{
 		Buffer stagingBuffer = { Width * Height * 2, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -47,7 +47,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgbImage2D(U32 Width, U32 Height, void* Data)
+	Image* ImageVariance::CreateRgbImage2D(void* Data, U32 Width, U32 Height)
 	{
 		Buffer stagingBuffer = { Width * Height * 3, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -68,7 +68,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgbaImage2D(U32 Width, U32 Height, void* Data)
+	Image* ImageVariance::CreateRgbaImage2D(void* Data, U32 Width, U32 Height)
 	{
 		Buffer stagingBuffer = { Width * Height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 

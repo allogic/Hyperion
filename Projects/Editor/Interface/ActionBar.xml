@@ -1,0 +1,13 @@
+<Root>
+	<GridPanel
+		HorizontalAlignment="Center"
+		VerticalAlignment="Bottom"
+		Width="500"
+		Height="50"
+		Rows="1"
+		Columns="10"
+		BackgroundColor="FFFFFF22">
+		<MyButton Row="0" Column="0" BackgroundColor="FF4400FF" Text="Button"></MyButton>
+		<MyButton Row="0" Column="1" BackgroundColor="FF8800FF" Text="Button"></MyButton>
+	</GridPanel>	
+</Root>

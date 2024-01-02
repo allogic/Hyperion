@@ -1706,11 +1706,11 @@ class TinyGLTF {
 #include "json.hpp"
 #else
 #ifndef TINYGLTF_NO_INCLUDE_RAPIDJSON
-#include "document.h"
-#include "prettywriter.h"
-#include "rapidjson.h"
-#include "stringbuffer.h"
-#include "writer.h"
+#include <Engine/RapidJson/document.h>
+#include <Engine/RapidJson/prettywriter.h>
+#include <Engine/RapidJson/rapidjson.h>
+#include <Engine/RapidJson/stringbuffer.h>
+#include <Engine/RapidJson/writer.h>
 #endif
 #endif
 #endif
@@ -1722,13 +1722,13 @@ class TinyGLTF {
 
 #ifndef TINYGLTF_NO_STB_IMAGE
 #ifndef TINYGLTF_NO_INCLUDE_STB_IMAGE
-#include "stb_image.h"
+#include <Engine/StbImage/stb_image.h>
 #endif
 #endif
 
 #ifndef TINYGLTF_NO_STB_IMAGE_WRITE
 #ifndef TINYGLTF_NO_INCLUDE_STB_IMAGE_WRITE
-#include "stb_image_write.h"
+#include <Engine/StbImage/stb_image_write.h>
 #endif
 #endif
 

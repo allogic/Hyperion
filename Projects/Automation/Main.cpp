@@ -5,12 +5,11 @@
 
 #include <Engine/Ecs/Entity.h>
 
-#include <Engine/Interface/FontAtlas.h>
-#include <Engine/Interface/LayoutParser.h>
-#include <Engine/Interface/Node.h>
+#include <Engine/Interface/Interface.h>
 
-#include <Engine/Vulkan/Window.h>
-#include <Engine/Vulkan/Renderer.h>
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
 
 #include <Automation/Scenes/Game.h>
 
@@ -21,9 +20,11 @@ I32 main()
 {
 	Window::Create("Automation", 1920, 1080);
 
-	FontAtlas::Load(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
+	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
 
-	Node* layout = LayoutParser::Parse(ROOT_PATH "Projects\\Automation\\Interface\\Profiler.xml");
+#ifdef NDEBUG
+	Interface::ParseLayout(ROOT_PATH "Projects\\Automation\\Interface\\Profiler.xml");
+#endif
 
 	Game* scene = new Game{ 5, 5 };
 
@@ -31,7 +32,6 @@ I32 main()
 
 	root->PrintHierarchy();
 	scene->PrintHierarchy();
-	layout->PrintHierarchy();
 
 	while (!Window::ShouldClose())
 	{
@@ -41,8 +41,8 @@ I32 main()
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 0.0F, 1.0F, 0.0F }, 0x00FF00FF);
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 0.0F, 0.0F, 1.0F }, 0x0000FFFF);
 
-		layout->Update();
-		layout->Render();
+		Interface::Update();
+		Interface::Render();
 
 		scene->Update();
 
@@ -52,8 +52,8 @@ I32 main()
 	}
 
 	delete scene;
-	delete layout;
 
+	Interface::Destroy();
 	Window::Destroy();
 
 	return 0;

@@ -1,7 +1,8 @@
 #include <Engine/Common/Macros.h>
 #include <Engine/Common/FileSystem.h>
 
-#include <Engine/Vulkan/Window.h>
+#include <Engine/Platform/Window.h>
+
 #include <Engine/Vulkan/Pipeline.h>
 
 namespace hyperion

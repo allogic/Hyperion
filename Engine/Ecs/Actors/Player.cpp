@@ -8,7 +8,7 @@
 
 #include <Engine/Ecs/Components/Camera.h>
 
-#include <Engine/Vulkan/Window.h>
+#include <Engine/Platform/Window.h>
 
 namespace hyperion
 {

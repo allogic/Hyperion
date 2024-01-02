@@ -9,7 +9,7 @@
 #include <Engine/Interface/Nodes/Text.h>
 #include <Engine/Interface/Nodes/Histogram.h>
 
-#include <Engine/Vulkan/Window.h>
+#include <Engine/Platform/Window.h>
 
 namespace hyperion
 {

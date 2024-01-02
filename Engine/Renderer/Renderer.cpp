@@ -12,12 +12,14 @@
 
 #include <Engine/Interface/FontAtlas.h>
 
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
+
 #include <Engine/Vulkan/Image.h>
 #include <Engine/Vulkan/ImageVariance.h>
 #include <Engine/Vulkan/Buffer.h>
 #include <Engine/Vulkan/BufferVariance.h>
-#include <Engine/Vulkan/Renderer.h>
-#include <Engine/Vulkan/Window.h>
 #include <Engine/Vulkan/CommandBuffer.h>
 #include <Engine/Vulkan/Pipeline.h>
 
@@ -42,7 +44,7 @@ namespace hyperion
 		CreateRenderPass();
 		CreateFrameBuffer();
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		CreateQueryPool();
 #endif
 
@@ -76,7 +78,7 @@ namespace hyperion
 		DestroyDescriptorSetLayout();
 		DestroyDescriptorPool();
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		DestroyQueryPool();
 #endif
 
@@ -205,7 +207,7 @@ namespace hyperion
 		}
 	}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 	void Renderer::CreateQueryPool()
 	{
 		VkQueryPoolCreateInfo queryPoolCreateInfo = {};
@@ -256,7 +258,7 @@ namespace hyperion
 		vkDestroyDescriptorPool(gWindow->GetDevice(), mDebugDescriptorPool, 0);
 	}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 	void Renderer::DestroyQueryPool()
 	{
 		vkDestroyQueryPool(gWindow->GetDevice(), mQueryPool, 0);
@@ -550,7 +552,7 @@ namespace hyperion
 		vkCmdSetViewport(mGraphicCommandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(mGraphicCommandBuffer, 0, 1, &scissor);
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		vkCmdWriteTimestamp(mGraphicCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 0);
 #endif
 
@@ -599,7 +601,7 @@ namespace hyperion
 			vkCmdDrawIndexed(mGraphicCommandBuffer, mTextIndexCount, 1, 0, 0, 0);
 		}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		vkCmdWriteTimestamp(mGraphicCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 1);
 #endif
 
@@ -619,7 +621,7 @@ namespace hyperion
 
 		VK_CHECK(vkBeginCommandBuffer(mComputeCommandBuffer, &commandBufferBeginInfo));
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 2);
 #endif
 
@@ -628,7 +630,7 @@ namespace hyperion
 			Scene->DispatchTransformHierarchy();
 		}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 3);
 #endif
 
@@ -735,7 +737,7 @@ namespace hyperion
 			VK_CHECK(vkQueuePresentKHR(gWindow->GetPresentQueue(), &presentInfo));
 		}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		std::array<U64, 4> queryResults = {};
 
 		vkGetQueryPoolResults(gWindow->GetDevice(), gRenderer->mQueryPool, 0, 4, sizeof(U64) * queryResults.size(), queryResults.data(), sizeof(U64), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
@@ -770,7 +772,7 @@ namespace hyperion
 			delete mFontAtlas;
 		}
 
-		mFontAtlas = ImageVariance::CreateRImage2D(Width, Height, (void*)Atlas.data());
+		mFontAtlas = ImageVariance::CreateRImage2D((void*)Atlas.data(), Width, Height);
 	}
 
 	void Renderer::SetFontInfo(std::string const& Font, FontInfo const& Info)

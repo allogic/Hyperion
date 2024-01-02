@@ -7,12 +7,11 @@
 
 #include <Engine/Ecs/Actors/Test.h>
 
-#include <Engine/Interface/FontAtlas.h>
-#include <Engine/Interface/LayoutParser.h>
-#include <Engine/Interface/Node.h>
+#include <Engine/Interface/Interface.h>
 
-#include <Engine/Vulkan/Window.h>
-#include <Engine/Vulkan/Renderer.h>
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
 
 #include <Editor/Interface/MyButton.h>
 
@@ -23,19 +22,25 @@ I32 main()
 {
 	Window::Create("Editor", 1920, 1080);
 
-	FontAtlas::Load(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
-	FontAtlas::Load(ROOT_PATH "Engine\\Fonts\\Sagan.ttf");
-
 	LayoutParser::Register<MyButton>();
 
-	Node* layout = LayoutParser::Parse(ROOT_PATH "Projects\\Editor\\Interface\\Main.xml");
+	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
+	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\Sagan.ttf");
+
+#ifdef NDEBUG
+	Interface::ParseLayout(ROOT_PATH "Projects\\Editor\\Interface\\Profiler.xml");
+#endif
+
+	Interface::ParseLayout(ROOT_PATH "Projects\\Editor\\Interface\\ActionBar.xml");
 
 	Scene* scene = new Scene;
+
+	scene->Load(ROOT_PATH "Projects\\Editor\\Models\\Shibahu\\scene.gltf");
 
 	Entity* root = scene->GetRoot();
 
 	{
-		U32 n = 3;
+		U32 n = 1;
 
 		for (U32 i = 0; i < n; ++i)
 		{
@@ -64,13 +69,12 @@ I32 main()
 
 	root->PrintHierarchy();
 	scene->PrintHierarchy();
-	layout->PrintHierarchy();
 
 	while (!Window::ShouldClose())
 	{
 		Window::MeasureTime();
 
-		Renderer::DrawText(R32V3{ 100.0F, 400.0F, 0.5F }, "Sagan", "Hyperion Engine", 4.0F, 0xFFFFFFFF);
+		Renderer::DrawText(R32V3{ 100.0F, 400.0F, 0.5F }, "Sagan", "Hyperion Engine", 2.0F, 0xFFFFFFFF);
 		Renderer::DrawText(R32V3{ 100.0F, 300.0F, 0.5F }, "ProggyClean", "- GPU Entity Component System", 2.0F, 0xFFFFFFFF);
 		Renderer::DrawText(R32V3{ 100.0F, 250.0F, 0.5F }, "ProggyClean", "- Intermediate XML Interface", 2.0F, 0xFFFFFFFF);
 		Renderer::DrawText(R32V3{ 100.0F, 200.0F, 0.5F }, "ProggyClean", "- Smart Font Texture Atlas", 2.0F, 0xFFFFFFFF);
@@ -81,8 +85,8 @@ I32 main()
 
 		Renderer::DrawDebugRectXZ(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 25.0F, 0.0F, 25.0F }, 0xFFFFFFFF);
 
-		layout->Update();
-		layout->Render();
+		Interface::Update();
+		Interface::Render();
 
 		scene->Update();
 
@@ -92,7 +96,6 @@ I32 main()
 	}
 	
 	delete scene;
-	delete layout;
 
 	Window::Destroy();
 

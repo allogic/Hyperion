@@ -399,3 +399,10 @@ FodyWeavers.xsd
 
 # SPIR-V
 *.spv
+
+# 3D Models
+*.gltf
+*.bin
+*.jpeg
+*.jpg
+*.png

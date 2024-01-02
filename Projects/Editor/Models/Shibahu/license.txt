@@ -1,0 +1,11 @@
+Model Information:
+* title:	Shibahu
+* source:	https://sketchfab.com/3d-models/shibahu-2e9dffd948f747668609a5a477daad86
+* author:	腱鞘炎の人 (https://sketchfab.com/Kensyouen)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Shibahu" (https://sketchfab.com/3d-models/shibahu-2e9dffd948f747668609a5a477daad86) by 腱鞘炎の人 (https://sketchfab.com/Kensyouen) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

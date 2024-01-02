@@ -486,9 +486,10 @@
     <ClInclude Include="Glm\vec3.hpp" />
     <ClInclude Include="Glm\vec4.hpp" />
     <ClInclude Include="Glm\vector_relational.hpp" />
-    <ClInclude Include="Gltf\tiny_gltf.h" />
+    <ClInclude Include="TinyGltf\tiny_gltf.h" />
     <ClInclude Include="ImageUtility.h" />
     <ClInclude Include="Interface\FontAtlas.h" />
+    <ClInclude Include="Interface\Interface.h" />
     <ClInclude Include="Interface\LayoutParser.h" />
     <ClInclude Include="Interface\Node.h" />
     <ClInclude Include="Interface\Nodes\Button.h" />
@@ -497,6 +498,44 @@
     <ClInclude Include="Interface\Nodes\StackPanel.h" />
     <ClInclude Include="Interface\Nodes\Text.h" />
     <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="RapidJson\allocators.h" />
+    <ClInclude Include="RapidJson\cursorstreamwrapper.h" />
+    <ClInclude Include="RapidJson\document.h" />
+    <ClInclude Include="RapidJson\encodedstream.h" />
+    <ClInclude Include="RapidJson\encodings.h" />
+    <ClInclude Include="RapidJson\error\en.h" />
+    <ClInclude Include="RapidJson\error\error.h" />
+    <ClInclude Include="RapidJson\filereadstream.h" />
+    <ClInclude Include="RapidJson\filewritestream.h" />
+    <ClInclude Include="RapidJson\fwd.h" />
+    <ClInclude Include="RapidJson\internal\biginteger.h" />
+    <ClInclude Include="RapidJson\internal\clzll.h" />
+    <ClInclude Include="RapidJson\internal\diyfp.h" />
+    <ClInclude Include="RapidJson\internal\dtoa.h" />
+    <ClInclude Include="RapidJson\internal\ieee754.h" />
+    <ClInclude Include="RapidJson\internal\itoa.h" />
+    <ClInclude Include="RapidJson\internal\meta.h" />
+    <ClInclude Include="RapidJson\internal\pow10.h" />
+    <ClInclude Include="RapidJson\internal\regex.h" />
+    <ClInclude Include="RapidJson\internal\stack.h" />
+    <ClInclude Include="RapidJson\internal\strfunc.h" />
+    <ClInclude Include="RapidJson\internal\strtod.h" />
+    <ClInclude Include="RapidJson\internal\swap.h" />
+    <ClInclude Include="RapidJson\istreamwrapper.h" />
+    <ClInclude Include="RapidJson\memorybuffer.h" />
+    <ClInclude Include="RapidJson\memorystream.h" />
+    <ClInclude Include="RapidJson\msinttypes\inttypes.h" />
+    <ClInclude Include="RapidJson\msinttypes\stdint.h" />
+    <ClInclude Include="RapidJson\ostreamwrapper.h" />
+    <ClInclude Include="RapidJson\pointer.h" />
+    <ClInclude Include="RapidJson\prettywriter.h" />
+    <ClInclude Include="RapidJson\rapidjson.h" />
+    <ClInclude Include="RapidJson\reader.h" />
+    <ClInclude Include="RapidJson\schema.h" />
+    <ClInclude Include="RapidJson\stream.h" />
+    <ClInclude Include="RapidJson\stringbuffer.h" />
+    <ClInclude Include="RapidJson\uri.h" />
+    <ClInclude Include="RapidJson\writer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="StbImage\stb_image.h" />
     <ClInclude Include="StbImage\stb_image_write.h" />
@@ -508,9 +547,9 @@
     <ClInclude Include="Vulkan\Image.h" />
     <ClInclude Include="Vulkan\ImageVariance.h" />
     <ClInclude Include="Vulkan\Pipeline.h" />
-    <ClInclude Include="Vulkan\Renderer.h" />
-    <ClInclude Include="Vulkan\Vertex.h" />
-    <ClInclude Include="Vulkan\Window.h" />
+    <ClInclude Include="Renderer\Renderer.h" />
+    <ClInclude Include="Renderer\Vertex.h" />
+    <ClInclude Include="Platform\Window.h" />
     <ClInclude Include="Xml\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -525,6 +564,7 @@
     <ClCompile Include="Ecs\Entity.cpp" />
     <ClCompile Include="ImageUtility.cpp" />
     <ClCompile Include="Interface\FontAtlas.cpp" />
+    <ClCompile Include="Interface\Interface.cpp" />
     <ClCompile Include="Interface\LayoutParser.cpp" />
     <ClCompile Include="Interface\Node.cpp" />
     <ClCompile Include="Interface\Nodes\Button.cpp" />
@@ -541,8 +581,8 @@
     <ClCompile Include="Vulkan\Image.cpp" />
     <ClCompile Include="Vulkan\ImageVariance.cpp" />
     <ClCompile Include="Vulkan\Pipeline.cpp" />
-    <ClCompile Include="Vulkan\Renderer.cpp" />
-    <ClCompile Include="Vulkan\Window.cpp" />
+    <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Platform\Window.cpp" />
     <ClCompile Include="Xml\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>

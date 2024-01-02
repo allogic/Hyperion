@@ -4,8 +4,9 @@
 
 #include <Engine/Interface/Nodes/Histogram.h>
 
-#include <Engine/Vulkan/Renderer.h>
-#include <Engine/Vulkan/Window.h>
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
 
 namespace hyperion
 {

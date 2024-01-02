@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 #include <vector>
 #include <map>
+#include <cassert>
 
 #include <Engine/Forward.h>
 
@@ -12,8 +14,12 @@
 #include <Engine/Ecs/Transform.h>
 #include <Engine/Ecs/TransformHierarchy.h>
 
+#define TINYGLTF_USE_RAPIDJSON
+#include <Engine/TinyGltf/tiny_gltf.h>
+
+#include <Engine/Renderer/Vertex.h>
+
 #include <Engine/Vulkan/Buffer.h>
-#include <Engine/Vulkan/Renderer.h>
 
 namespace hyperion
 {
@@ -39,6 +45,16 @@ namespace hyperion
 
 	public:
 
+		bool Load(std::filesystem::path const& File);
+		bool Safe(std::filesystem::path const& File);
+
+	private:
+
+		void LoadImages();
+		void LoadNodesRecursive(tinygltf::Node const& Node, Entity* Parent);
+
+	public:
+
 		template<typename E, typename ... Argument>
 		E* CreateEntity(std::string const& Name, Entity* Parent = 0, Argument&&... Arg);
 
@@ -60,6 +76,15 @@ namespace hyperion
 	public:
 
 		void Update();
+
+	private:
+
+		tinygltf::Model mModel = {};
+
+	private:
+
+		std::map<Entity*, Buffer*> mSharedVertexBuffers = {};
+		std::map<Entity*, Buffer*> mSharedIndexBuffers = {};
 
 	private:
 

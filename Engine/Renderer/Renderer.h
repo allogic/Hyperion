@@ -10,7 +10,7 @@
 
 #include <Engine/Forward.h>
 
-#include <Engine/Vulkan/Vertex.h>
+#include <Engine/Renderer/Vertex.h>
 
 #include <vulkan/vulkan.h>
 
@@ -74,7 +74,7 @@ namespace hyperion
 
 	private:
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		void CreateQueryPool();
 #endif
 
@@ -94,7 +94,7 @@ namespace hyperion
 
 	private:
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		void DestroyQueryPool();
 #endif
 
@@ -171,7 +171,7 @@ namespace hyperion
 
 	private:
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		VkQueryPool mQueryPool = 0;
 #endif
 

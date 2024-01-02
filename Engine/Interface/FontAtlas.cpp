@@ -1,15 +1,19 @@
 #include <Engine/Common/Macros.h>
 #include <Engine/Common/Config.h>
 
-#include <Engine/Interface/FontAtlas.h>
-
 #include <Engine/FreeType/ft2build.h>
 #include <Engine/FreeType/freetype/freetype.h>
 
+#include <Engine/Interface/FontAtlas.h>
+#include <Engine/Interface/LayoutParser.h>
+#include <Engine/Interface/Node.h>
+
+#include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Renderer.h>
+
 #include <Engine/Vulkan/Image.h>
 #include <Engine/Vulkan/ImageVariance.h>
-#include <Engine/Vulkan/Renderer.h>
-#include <Engine/Vulkan/Window.h>
 
 namespace hyperion
 {
@@ -17,7 +21,9 @@ namespace hyperion
 	static U32 sAtlasHeight = 0;
 	static U32 sFontIndex = 0;
 
-	static std::vector<U8> sAtlas = {};
+	static std::vector<U8> sFontAtlas = {};
+
+	static std::vector<Node*> sLayoutNodes = {};
 
 	bool FontAtlas::Load(std::filesystem::path const& File)
 	{
@@ -51,7 +57,7 @@ namespace hyperion
 				sAtlasWidth = fontWidth;
 				sAtlasHeight += fontHeight;
 
-				sAtlas.resize(fontWidth * fontHeight * (sFontIndex + 1));
+				sFontAtlas.resize(fontWidth * fontHeight * (sFontIndex + 1));
 
 				for (U8 c = 0; c < 128; ++c)
 				{
@@ -88,7 +94,7 @@ namespace hyperion
 				fontInfo.CharacterSize = characterSize;
 
 				gRenderer->SetFontInfo(fontName, fontInfo);
-				gRenderer->UpdateFontAtlas(sAtlasWidth, sAtlasHeight, sAtlas);
+				gRenderer->UpdateFontAtlas(sAtlasWidth, sAtlasHeight, sFontAtlas);
 				gRenderer->UpdateTextDescriptorSets(0);
 
 				sFontIndex++;
@@ -111,7 +117,7 @@ namespace hyperion
 				U32 atlasIndex = (Character * FontSize + i) + (sFontIndex * FontHeight + j) * FontWidth;
 				U32 bitmapIndex = i + j * BitmapWidth;
 
-				sAtlas[atlasIndex] = Bitmap[bitmapIndex];
+				sFontAtlas[atlasIndex] = Bitmap[bitmapIndex];
 			}
 		}
 	}
