@@ -30,7 +30,7 @@ namespace hyperion
 	{
 		mDescriptorSetLayout = DescriptorSetLayout;
 
-		mBuffer = BufferVariance::CreateStorageCoherent(sizeof(Transform) * 128);
+		mBuffer = BufferVariance::CreateStorageCoherent(sizeof(Transform) * 256);
 		mParentBuffer = (ParentBuffer) ? ParentBuffer : mBuffer;
 
 		mDescriptorPool = Pipeline::CreateDescriptorPool(1, sDescriptorSetLayoutBindings);
@@ -195,7 +195,7 @@ namespace hyperion
 
 			//vkCmdPushConstants(gRenderer->GetComputeCommandBuffer(), mTransformPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(PerEntityData), &perEntityData);
 
-			vkCmdDispatch(gRenderer->GetComputeCommandBuffer(), 4, 1, 1);
+			vkCmdDispatch(gRenderer->GetComputeCommandBuffer(), 8, 1, 1);
 		}
 	}
 

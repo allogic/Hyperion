@@ -25,7 +25,7 @@ namespace hyperion
 	{
 		"VK_KHR_surface",
 		"VK_KHR_win32_surface",
-#ifdef NDEBUG
+#ifdef _DEBUG
 		"VK_EXT_debug_utils",
 #endif
 	};
@@ -35,7 +35,7 @@ namespace hyperion
 		"VK_KHR_swapchain",
 	};
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	static std::vector<char const*> sValidationLayers =
 	{
 		"VK_LAYER_KHRONOS_validation",
@@ -465,7 +465,7 @@ namespace hyperion
 		instanceCreateInfo.enabledExtensionCount = (U32)sLayerExtensions.size();
 		instanceCreateInfo.ppEnabledExtensionNames = sLayerExtensions.data();
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
 		debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
@@ -479,7 +479,7 @@ namespace hyperion
 
 		VK_CHECK(vkCreateInstance(&instanceCreateInfo, 0, &mInstance));
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		CreateDebugUtilsMessengerEXT(mInstance, &debugCreateInfo, 0, &mDebugMessenger);
 #endif
 	}
@@ -629,7 +629,7 @@ namespace hyperion
 		deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 		deviceCreateInfo.ppEnabledExtensionNames = sDeviceExtensions.data();
 		deviceCreateInfo.enabledExtensionCount = (U32)sDeviceExtensions.size();
-#ifdef NDEBUG
+#ifdef _DEBUG
 		deviceCreateInfo.ppEnabledLayerNames = sValidationLayers.data();
 		deviceCreateInfo.enabledLayerCount = (U32)sValidationLayers.size();
 #endif
@@ -756,7 +756,7 @@ namespace hyperion
 
 	void Window::DestroyInstance()
 	{
-#ifdef NDEBUG
+#ifdef _DEBUG
 		DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, 0);
 #endif
 
@@ -874,7 +874,7 @@ namespace hyperion
 		return FindSupportedFormat(formats, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 	}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	VkResult Window::CreateDebugUtilsMessengerEXT(VkInstance Instance, const VkDebugUtilsMessengerCreateInfoEXT* DebugCreateInfo, const VkAllocationCallbacks* Allocator, VkDebugUtilsMessengerEXT* Messenger)
 	{
 		PFN_vkCreateDebugUtilsMessengerEXT createDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(Instance, "vkCreateDebugUtilsMessengerEXT");

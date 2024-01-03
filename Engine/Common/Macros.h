@@ -2,13 +2,13 @@
 
 #include <cstdio>
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	#define LOG(FMT, ...) std::printf(FMT, __VA_ARGS__);
 #else
 	#define LOG(FMT, ...)
 #endif
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	#define VK_CHECK(EXPR) { \
 		VkResult result = (EXPR); \
 		if (result != VK_SUCCESS) { \

@@ -28,7 +28,7 @@ namespace hyperion
 	private:
 
 		R32 mKeyboardMoveSpeedFast = 100.0F;
-		R32 mKeyboardMoveSpeedNormal = 5.0F;
+		R32 mKeyboardMoveSpeedNormal = 0.1F;
 
 		R32 mMouseMoveSpeedFast = 5.0F;
 		R32 mMouseMoveSpeedNormal = 0.1F;

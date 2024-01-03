@@ -14,12 +14,12 @@
 #include <Engine/Ecs/Transform.h>
 #include <Engine/Ecs/TransformHierarchy.h>
 
-#define TINYGLTF_USE_RAPIDJSON
-#include <Engine/TinyGltf/tiny_gltf.h>
-
 #include <Engine/Renderer/Vertex.h>
 
 #include <Engine/Vulkan/Buffer.h>
+
+struct aiScene;
+struct aiNode;
 
 namespace hyperion
 {
@@ -36,6 +36,8 @@ namespace hyperion
 
 		inline auto GetRoot() const { return mRoot; }
 		inline auto const& GetEntities() const { return mEntities; }
+		inline auto const& GetEntitiesToBeRendered() const { return mEntitiesToBeRendered; }
+		inline auto const& GetEntitiesToBeComputed() const { return mEntitiesToBeComputed; }
 		inline auto GetPlayer() const { return mPlayer; }
 
 	public:
@@ -50,8 +52,7 @@ namespace hyperion
 
 	private:
 
-		void LoadImages();
-		void LoadNodesRecursive(tinygltf::Node const& Node, Entity* Parent);
+		void LoadNodesRecursive(aiScene const* Scene, aiNode const* Node, Entity* Parent = 0);
 
 	public:
 
@@ -75,11 +76,8 @@ namespace hyperion
 
 	public:
 
+		void Commit();
 		void Update();
-
-	private:
-
-		tinygltf::Model mModel = {};
 
 	private:
 
@@ -91,6 +89,8 @@ namespace hyperion
 		U32 mUniqueEntityId = 0;
 
 		std::vector<Entity*> mEntities = {};
+		std::vector<Entity*> mEntitiesToBeRendered = {};
+		std::vector<Entity*> mEntitiesToBeComputed = {};
 
 		Entity* mRoot = 0;
 		Entity* mPlayer = 0;

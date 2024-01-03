@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;C:\VulkanSDK\1.3.268.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)Assimp;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;C:\VulkanSDK\1.3.268.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)FreeType;C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)Assimp;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -135,6 +135,89 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Assimp\aabb.h" />
+    <ClInclude Include="Assimp\ai_assert.h" />
+    <ClInclude Include="Assimp\anim.h" />
+    <ClInclude Include="Assimp\AssertHandler.h" />
+    <ClInclude Include="Assimp\Base64.hpp" />
+    <ClInclude Include="Assimp\BaseImporter.h" />
+    <ClInclude Include="Assimp\Bitmap.h" />
+    <ClInclude Include="Assimp\BlobIOSystem.h" />
+    <ClInclude Include="Assimp\ByteSwapper.h" />
+    <ClInclude Include="Assimp\camera.h" />
+    <ClInclude Include="Assimp\cexport.h" />
+    <ClInclude Include="Assimp\cfileio.h" />
+    <ClInclude Include="Assimp\cimport.h" />
+    <ClInclude Include="Assimp\ColladaMetaData.h" />
+    <ClInclude Include="Assimp\color4.h" />
+    <ClInclude Include="Assimp\commonMetaData.h" />
+    <ClInclude Include="Assimp\Compiler\poppack1.h" />
+    <ClInclude Include="Assimp\Compiler\pstdint.h" />
+    <ClInclude Include="Assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="Assimp\config.h" />
+    <ClInclude Include="Assimp\CreateAnimMesh.h" />
+    <ClInclude Include="Assimp\DefaultIOStream.h" />
+    <ClInclude Include="Assimp\DefaultIOSystem.h" />
+    <ClInclude Include="Assimp\DefaultLogger.hpp" />
+    <ClInclude Include="Assimp\defs.h" />
+    <ClInclude Include="Assimp\Exceptional.h" />
+    <ClInclude Include="Assimp\Exporter.hpp" />
+    <ClInclude Include="Assimp\fast_atof.h" />
+    <ClInclude Include="Assimp\GenericProperty.h" />
+    <ClInclude Include="Assimp\GltfMaterial.h" />
+    <ClInclude Include="Assimp\Hash.h" />
+    <ClInclude Include="Assimp\Importer.hpp" />
+    <ClInclude Include="Assimp\importerdesc.h" />
+    <ClInclude Include="Assimp\IOStream.hpp" />
+    <ClInclude Include="Assimp\IOStreamBuffer.h" />
+    <ClInclude Include="Assimp\IOSystem.hpp" />
+    <ClInclude Include="Assimp\light.h" />
+    <ClInclude Include="Assimp\LineSplitter.h" />
+    <ClInclude Include="Assimp\LogAux.h" />
+    <ClInclude Include="Assimp\Logger.hpp" />
+    <ClInclude Include="Assimp\LogStream.hpp" />
+    <ClInclude Include="Assimp\material.h" />
+    <ClInclude Include="Assimp\MathFunctions.h" />
+    <ClInclude Include="Assimp\matrix3x3.h" />
+    <ClInclude Include="Assimp\matrix4x4.h" />
+    <ClInclude Include="Assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="Assimp\mesh.h" />
+    <ClInclude Include="Assimp\metadata.h" />
+    <ClInclude Include="Assimp\NullLogger.hpp" />
+    <ClInclude Include="Assimp\ObjMaterial.h" />
+    <ClInclude Include="Assimp\ParsingUtils.h" />
+    <ClInclude Include="Assimp\pbrmaterial.h" />
+    <ClInclude Include="Assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="Assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="Assimp\postprocess.h" />
+    <ClInclude Include="Assimp\Profiler.h" />
+    <ClInclude Include="Assimp\ProgressHandler.hpp" />
+    <ClInclude Include="Assimp\qnan.h" />
+    <ClInclude Include="Assimp\quaternion.h" />
+    <ClInclude Include="Assimp\RemoveComments.h" />
+    <ClInclude Include="Assimp\scene.h" />
+    <ClInclude Include="Assimp\SceneCombiner.h" />
+    <ClInclude Include="Assimp\SGSpatialSort.h" />
+    <ClInclude Include="Assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="Assimp\SmallVector.h" />
+    <ClInclude Include="Assimp\SmoothingGroups.h" />
+    <ClInclude Include="Assimp\SpatialSort.h" />
+    <ClInclude Include="Assimp\StandardShapes.h" />
+    <ClInclude Include="Assimp\StreamReader.h" />
+    <ClInclude Include="Assimp\StreamWriter.h" />
+    <ClInclude Include="Assimp\StringComparison.h" />
+    <ClInclude Include="Assimp\StringUtils.h" />
+    <ClInclude Include="Assimp\Subdivision.h" />
+    <ClInclude Include="Assimp\texture.h" />
+    <ClInclude Include="Assimp\TinyFormatter.h" />
+    <ClInclude Include="Assimp\types.h" />
+    <ClInclude Include="Assimp\vector2.h" />
+    <ClInclude Include="Assimp\vector3.h" />
+    <ClInclude Include="Assimp\version.h" />
+    <ClInclude Include="Assimp\Vertex.h" />
+    <ClInclude Include="Assimp\XmlParser.h" />
+    <ClInclude Include="Assimp\XMLTools.h" />
+    <ClInclude Include="Assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="Ecs\Actors\Player.h" />
     <ClInclude Include="Ecs\Actors\Test.h" />
     <ClInclude Include="Common\Config.h" />
@@ -586,6 +669,14 @@
     <ClCompile Include="Xml\tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assimp\color4.inl" />
+    <None Include="Assimp\material.inl" />
+    <None Include="Assimp\matrix3x3.inl" />
+    <None Include="Assimp\matrix4x4.inl" />
+    <None Include="Assimp\quaternion.inl" />
+    <None Include="Assimp\SmoothingGroups.inl" />
+    <None Include="Assimp\vector2.inl" />
+    <None Include="Assimp\vector3.inl" />
     <None Include="Glm\detail\func_common.inl" />
     <None Include="Glm\detail\func_common_simd.inl" />
     <None Include="Glm\detail\func_exponential.inl" />

@@ -1,3 +1,6 @@
+glslc PhysicallyBased.vert -o PhysicallyBased.vert.spv
+glslc PhysicallyBased.frag -o PhysicallyBased.frag.spv
+
 glslc Text.vert -o Text.vert.spv
 glslc Text.frag -o Text.frag.spv
 

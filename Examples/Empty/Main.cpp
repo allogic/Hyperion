@@ -17,7 +17,7 @@ I32 main()
 
 	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	Interface::ParseLayout(ROOT_PATH "Projects\\Automation\\Interface\\Profiler.xml");
 #endif
 

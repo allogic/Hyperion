@@ -74,7 +74,7 @@ namespace hyperion
 
 	private:
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		void CreateQueryPool();
 #endif
 
@@ -94,16 +94,18 @@ namespace hyperion
 
 	private:
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		void DestroyQueryPool();
 #endif
 
 	public:
 
+		void BuildPhysicallBasedDescriptorSets(U32 DescriptorCount);
 		void BuildTextDescriptorSets(U32 DescriptorCount);
 		void BuildInterfaceDescriptorSets(U32 DescriptorCount);
 		void BuildDebugDescriptorSets(U32 DescriptorCount);
 
+		void UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex);
 		void UpdateTextDescriptorSets(U32 DescriptorIndex);
 		void UpdateInterfaceDescriptorSets(U32 DescriptorIndex);
 		void UpdateDebugDescriptorSets(U32 DescriptorIndex);
@@ -171,9 +173,64 @@ namespace hyperion
 
 	private:
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		VkQueryPool mQueryPool = 0;
 #endif
+
+	private:
+
+		std::string mPhysicallyBasedVertexFile = ROOT_PATH "Engine\\Shaders\\PhysicallyBased.vert.spv";
+		std::string mPhysicallyBasedFragmentFile = ROOT_PATH "Engine\\Shaders\\PhysicallyBased.frag.spv";
+
+		std::vector<VkDescriptorSetLayoutBinding> mPhysicallyBasedDescriptorSetLayoutBindings =
+		{
+			{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
+			{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
+		};
+
+		std::vector<VkPushConstantRange> mPhysicallyBasedPushConstantRanges =
+		{
+
+		};
+
+		std::vector<VkVertexInputBindingDescription> mPhysicallyBasedVertexInputBindingDescriptions =
+		{
+			{ PhysicallyBasedVertexBindingId, sizeof(PhysicallyBasedVertex), VK_VERTEX_INPUT_RATE_VERTEX },
+		};
+
+		std::vector<VkVertexInputAttributeDescription> mPhysicallyBasedVertexInputAttributeDescriptions =
+		{
+			{ 0, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, 0 },
+			{ 1, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, Normal) },
+			{ 2, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, Tangent) },
+			{ 3, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, BiTangent) },
+
+			{ 4, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel0) },
+			{ 5, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel1) },
+			{ 6, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel2) },
+			{ 7, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel3) },
+			{ 8, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel4) },
+			{ 9, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel5) },
+			{ 10, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel6) },
+			{ 11, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, ColorChannel7) },
+
+			{ 12, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel0) },
+			{ 13, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel1) },
+			{ 14, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel2) },
+			{ 15, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel3) },
+			{ 16, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel4) },
+			{ 17, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel5) },
+			{ 18, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel6) },
+			{ 19, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel7) },
+		};
+
+		VkDescriptorPool mPhysicallyBasedDescriptorPool = 0;
+		VkDescriptorSetLayout mPhysicallyBasedDescriptorSetLayout = 0;
+
+		std::vector<VkDescriptorSet> mPhysicallyBasedDescriptorSets = {};
+
+		VkPipelineLayout mPhysicallyBasedPipelineLayout = 0;
+		VkPipeline mPhysicallyBasedPipeline = 0;
 
 	private:
 
@@ -207,8 +264,8 @@ namespace hyperion
 		std::vector<VkVertexInputAttributeDescription> mTextVertexInputAttributeDescriptions =
 		{
 			{ 0, TextVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, 0 },
-			{ 1, TextVertexBindingId, VK_FORMAT_R32G32_SFLOAT, sizeof(R32V3) },
-			{ 2, TextVertexBindingId, VK_FORMAT_R32_UINT, sizeof(R32V3) + sizeof(R32V2) },
+			{ 1, TextVertexBindingId, VK_FORMAT_R32_UINT, offsetof(TextVertex, ColorChannel0) },
+			{ 2, TextVertexBindingId, VK_FORMAT_R32G32_SFLOAT, offsetof(TextVertex, TexCoordChannel0) },
 		};
 
 		VkDescriptorPool mTextDescriptorPool = 0;
@@ -221,7 +278,7 @@ namespace hyperion
 
 		std::map<std::string, FontInfo> mFontInfos = {};
 
-		Image* mFontAtlas = 0;
+		Image* mFontAtlasImage = 0;
 
 	private:
 
@@ -254,8 +311,8 @@ namespace hyperion
 		std::vector<VkVertexInputAttributeDescription> mInterfaceVertexInputAttributeDescriptions =
 		{
 			{ 0, InterfaceVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, 0 },
-			{ 1, InterfaceVertexBindingId, VK_FORMAT_R32G32_SFLOAT, sizeof(R32V3) },
-			{ 2, InterfaceVertexBindingId, VK_FORMAT_R32_UINT, sizeof(R32V3) + sizeof(R32V2) },
+			{ 1, InterfaceVertexBindingId, VK_FORMAT_R32_UINT, offsetof(InterfaceVertex, ColorChannel0) },
+			{ 2, InterfaceVertexBindingId, VK_FORMAT_R32G32_SFLOAT, offsetof(InterfaceVertex, TexCoordChannel0) },
 		};
 
 		VkDescriptorPool mInterfaceDescriptorPool = 0;
@@ -296,7 +353,7 @@ namespace hyperion
 		std::vector<VkVertexInputAttributeDescription> mDebugVertexInputAttributeDescriptions =
 		{
 			{ 0, DebugVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, 0 },
-			{ 1, DebugVertexBindingId, VK_FORMAT_R32_UINT, sizeof(R32V3) },
+			{ 1, DebugVertexBindingId, VK_FORMAT_R32_UINT, offsetof(DebugVertex, ColorChannel0) },
 		};
 
 		VkDescriptorPool mDebugDescriptorPool = 0;

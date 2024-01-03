@@ -1,8 +1,8 @@
 #version 450 core
 
 layout(location = 0) in vec3 vertexPosition;
-layout(location = 1) in vec2 vertexUv;
-layout(location = 2) in uint vertexColor;
+layout(location = 1) in uint vertexColorChannel0;
+layout(location = 2) in vec2 vertexTexCoordChannel0;
 
 layout(binding = 0) uniform TimeInfo
 {
@@ -22,8 +22,8 @@ layout(binding = 2) uniform ViewProjection
 } viewProjection;
 
 layout(location = 0) out vec3 outputPosition;
-layout(location = 1) out vec2 outputUv;
-layout(location = 2) flat out uint outputColor;
+layout(location = 1) flat out uint outputColorChannel0;
+layout(location = 2) out vec2 outputTexCoordChannel0;
 
 void main()
 {
@@ -33,8 +33,8 @@ void main()
 	vec4 ndcPosition = vec4(ndcX, ndcY, vertexPosition.z, 1.0);
 
 	outputPosition = vec3(ndcPosition);
-	outputUv = vertexUv;
-	outputColor = vertexColor;
+	outputColorChannel0 = vertexColorChannel0;
+	outputTexCoordChannel0 = vertexTexCoordChannel0;
 
 	gl_Position = ndcPosition;
 }

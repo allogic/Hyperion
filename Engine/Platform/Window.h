@@ -179,7 +179,7 @@ namespace hyperion
 
 	private:
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		static VkResult CreateDebugUtilsMessengerEXT(VkInstance Instance, const VkDebugUtilsMessengerCreateInfoEXT* DebugCreateInfo, const VkAllocationCallbacks* Allocator, VkDebugUtilsMessengerEXT* Messenger);
 		static void DestroyDebugUtilsMessengerEXT(VkInstance Instance, VkDebugUtilsMessengerEXT Messenger, const VkAllocationCallbacks* Allocator);
 		static VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT MessageType, const VkDebugUtilsMessengerCallbackDataEXT* CallbackData, void* UserData);
@@ -208,7 +208,7 @@ namespace hyperion
 
 		VkInstance mInstance = 0;
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		VkDebugUtilsMessengerEXT mDebugMessenger = 0;
 #endif
 

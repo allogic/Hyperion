@@ -27,7 +27,7 @@ I32 main()
 	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\ProggyClean.ttf");
 	Interface::LoadFont(ROOT_PATH "Engine\\Fonts\\Sagan.ttf");
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	Interface::ParseLayout(ROOT_PATH "Projects\\Editor\\Interface\\Profiler.xml");
 #endif
 
@@ -35,7 +35,8 @@ I32 main()
 
 	Scene* scene = new Scene;
 
-	scene->Load(ROOT_PATH "Projects\\Editor\\Models\\Shibahu\\scene.gltf");
+	scene->Load(ROOT_PATH "Projects\\Editor\\Models\\Shibahu2\\untitled.glb");
+	scene->Commit();
 
 	Entity* root = scene->GetRoot();
 

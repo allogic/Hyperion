@@ -126,7 +126,7 @@ void main()
 			else
 			{
 				transformBuffer.transforms[transformIndex].worldRotation = multiplyQuaternions(localRotation, parentTransform.worldRotation);
-				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.worldRotation, transform.localPosition);
+				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.worldRotation, -transform.localPosition);
 			}
 		}
 	}

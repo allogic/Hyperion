@@ -5,6 +5,11 @@
 
 #include <Engine/Scene.h>
 
+#include <Engine/Assimp/Importer.hpp>
+#include <Engine/Assimp/Exporter.hpp>
+#include <Engine/Assimp/scene.h>
+#include <Engine/Assimp/postprocess.h>
+
 #include <Engine/Common/Macros.h>
 
 #include <Engine/Ecs/Actors/Player.h>
@@ -12,66 +17,13 @@
 #include <Engine/Ecs/Components/Camera.h>
 #include <Engine/Ecs/Components/Renderable.h>
 
+#include <Engine/Renderer/Renderer.h>
+#include <Engine/Renderer/Vertex.h>
+
 #include <Engine/Vulkan/Buffer.h>
 #include <Engine/Vulkan/BufferVariance.h>
 #include <Engine/Vulkan/Image.h>
 #include <Engine/Vulkan/ImageVariance.h>
-
-#define CONVERT_VERTEX_BUFFER(TYPE, BUFFER, ACCESSOR, VERTICES, MEMBER) \
-{ \
-	VERTICES.resize(glm::max(VERTICES.size(), ACCESSOR.count)); \
-	TYPE const* data = (TYPE const*)(BUFFER.data.data() + ACCESSOR.byteOffset); \
-	for (U64 i = 0; i < ACCESSOR.count; ++i) \
-	{ \
-		switch (ACCESSOR.type) \
-		{ \
-			case TINYGLTF_TYPE_VEC2: VERTICES[i].MEMBER = R32V4{ (R32)(*(data + i + 0)), (R32)(*(data + i + 1)),                   0.0F,                   0.0F }; break; \
-			case TINYGLTF_TYPE_VEC3: VERTICES[i].MEMBER = R32V4{ (R32)(*(data + i + 0)), (R32)(*(data + i + 1)), (R32)(*(data + i + 2)),                   0.0F }; break; \
-			case TINYGLTF_TYPE_VEC4: VERTICES[i].MEMBER = R32V4{ (R32)(*(data + i + 0)), (R32)(*(data + i + 1)), (R32)(*(data + i + 2)), (R32)(*(data + i + 3)) }; break; \
-			default: assert(0); break; \
-		} \
-	} \
-} \
-
-#define CONVERT_INDEX_BUFFER(TYPE, BUFFER, ACCESSOR, INDICES) \
-{ \
-	INDICES.resize(glm::max(INDICES.size(), ACCESSOR.count)); \
-	TYPE const* data = (TYPE const*)(BUFFER.data.data() + ACCESSOR.byteOffset); \
-	for (U64 i = 0; i < ACCESSOR.count; ++i) \
-	{ \
-		switch (ACCESSOR.type) \
-		{ \
-			case TINYGLTF_TYPE_SCALAR: INDICES[i] = (U32)(*(data + i)); break; \
-			default: assert(0); break; \
-		} \
-	} \
-} \
-
-#define CONVERT_VERTICES(BUFFER, ACCESSOR, VERTICES, MEMBER) \
-switch (ACCESSOR.componentType) \
-{ \
-	case TINYGLTF_COMPONENT_TYPE_BYTE:           CONVERT_VERTEX_BUFFER( I8, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:  CONVERT_VERTEX_BUFFER( U8, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_SHORT:          CONVERT_VERTEX_BUFFER(I16, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: CONVERT_VERTEX_BUFFER(U16, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_INT:            CONVERT_VERTEX_BUFFER(I32, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:   CONVERT_VERTEX_BUFFER(U32, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_FLOAT:          CONVERT_VERTEX_BUFFER(R32, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	case TINYGLTF_COMPONENT_TYPE_DOUBLE:         CONVERT_VERTEX_BUFFER(R64, BUFFER, ACCESSOR, VERTICES, MEMBER); break; \
-	default: assert(0); break; \
-} \
-
-#define CONVERT_INDICES(BUFFER, ACCESSOR, INDICES) \
-switch (ACCESSOR.componentType) \
-{ \
-	case TINYGLTF_COMPONENT_TYPE_BYTE:           CONVERT_INDEX_BUFFER( I8, BUFFER, ACCESSOR, INDICES); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:  CONVERT_INDEX_BUFFER( U8, BUFFER, ACCESSOR, INDICES); break; \
-	case TINYGLTF_COMPONENT_TYPE_SHORT:          CONVERT_INDEX_BUFFER(I16, BUFFER, ACCESSOR, INDICES); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: CONVERT_INDEX_BUFFER(U16, BUFFER, ACCESSOR, INDICES); break; \
-	case TINYGLTF_COMPONENT_TYPE_INT:            CONVERT_INDEX_BUFFER(I32, BUFFER, ACCESSOR, INDICES); break; \
-	case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:   CONVERT_INDEX_BUFFER(U32, BUFFER, ACCESSOR, INDICES); break; \
-	default: assert(0); break; \
-} \
 
 namespace hyperion
 {
@@ -98,36 +50,20 @@ namespace hyperion
 
 	bool Scene::Load(std::filesystem::path const& File)
 	{
-		bool result = false;
+		Assimp::Importer importer = {};
 
-		tinygltf::TinyGLTF loader = {};
+		U32 importFlags = aiProcess_GenSmoothNormals | aiProcess_LimitBoneWeights | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices;
 
-		std::string errorMsg = "";
-		std::string warningMsg = "";
+		aiScene const* scene = importer.ReadFile(File.string(), importFlags);
 
-		result = loader.LoadASCIIFromFile(&mModel, &errorMsg, &warningMsg, File.string());
-
-		if (!errorMsg.empty())
+		if (scene && (scene->mFlags & ~(AI_SCENE_FLAGS_INCOMPLETE)) && scene->mRootNode)
 		{
-			LOG(errorMsg.data());
+			LoadNodesRecursive(scene, scene->mRootNode);
+
+			return true;
 		}
 
-		if (!warningMsg.empty())
-		{
-			LOG(warningMsg.data());
-		}
-
-		if (result)
-		{
-			tinygltf::Scene const& scene = mModel.scenes[mModel.defaultScene];
-
-			for (auto const& node : scene.nodes)
-			{
-				LoadNodesRecursive(mModel.nodes[node], 0);
-			}
-		}
-
-		return result;
+		return false;
 	}
 
 	bool Scene::Safe(std::filesystem::path const& File)
@@ -135,175 +71,118 @@ namespace hyperion
 		return false;
 	}
 
-	/*
-	void Scene::LoadBuffer()
+	void Scene::LoadNodesRecursive(aiScene const* Scene, aiNode const* Node, Entity* Parent)
 	{
-		U32 bufferCount = (U32)mModel.bufferViews.size();
+		Entity* entity = CreateEntity<Entity>(Node->mName.C_Str(), Parent);
 
-		mBuffers.resize(bufferCount);
-
-		for (U32 i = 0; i < bufferCount; ++i)
-		{
-			tinygltf::BufferView const& bufferView = mModel.bufferViews[i];
-
-			if (bufferView.buffer >= 0)
-			{
-				tinygltf::Buffer const& buffer = mModel.buffers[bufferView.buffer];
-
-				void* data = (void*)(buffer.data.data() + bufferView.byteOffset);
-				U64 size = bufferView.byteLength;
-
-				if (bufferView.target > 0)
-				{
-					switch (bufferView.target)
-					{
-						case TINYGLTF_TARGET_ARRAY_BUFFER: mBuffers[i] = BufferVariance::CreateVertex(data, size); break;
-						case TINYGLTF_TARGET_ELEMENT_ARRAY_BUFFER: mBuffers[i] = BufferVariance::CreateIndex(data, size); break;
-						default: assert(0); break;
-					}
-				}
-			}
-		}
-	}
-
-	void Scene::LoadImages()
-	{
-		U32 imageCount = (U32)mModel.images.size();
-
-		mImages.resize(imageCount);
-
-		for (U32 i = 0; i < imageCount; ++i)
-		{
-			tinygltf::Texture const& texture = mModel.textures[i];
-
-			if (texture.source >= 0)
-			{
-				tinygltf::Image const& image = mModel.images[texture.source];
-
-				void* data = (void*)image.image.data();
-				U32 width = image.width;
-				U32 height = image.height;
-
-				assert(image.bits == 8); // TODO
-
-				switch (image.component)
-				{
-					case 1: mImages[i] = ImageVariance::CreateRImage2D(data, width, height); break;
-					case 2: mImages[i] = ImageVariance::CreateRgImage2D(data, width, height); break;
-					case 3: mImages[i] = ImageVariance::CreateRgbImage2D(data, width, height); break;
-					case 4: mImages[i] = ImageVariance::CreateRgbaImage2D(data, width, height); break;
-					default: assert(0); break;
-				}
-			}
-		}
-	}
-	*/
-
-	void Scene::LoadNodesRecursive(tinygltf::Node const& Node, Entity* Parent)
-	{
-		Entity* entity = CreateEntity<Entity>(Node.name, Parent);
-
-		LOG("Node:%s\n", Node.name.data());
+		LOG("Node:%s\n", Node->mName.C_Str());
 
 		Transform* transform = GetTransform(entity);
 
-		if (Node.translation.size() >= 3)
+		aiVector3D position = {};
+		aiQuaternion rotation = {};
+		aiVector3D scale = {};
+
+		Node->mTransformation.Decompose(scale, rotation, position);
+
+		transform->LocalPosition = R32V3{ position.x, position.y, position.z };
+		transform->LocalEulerAngles = glm::degrees(glm::eulerAngles(R32Q{ rotation.w, rotation.x, rotation.y, rotation.z }));
+		transform->LocalScale = R32V3{ scale.x, scale.y, scale.z };
+
+		std::vector<PhysicallyBasedVertex> vertices = {};
+		std::vector<U32> indices = {};
+
+		if (Node->mNumMeshes > 0)
 		{
-			transform->LocalPosition = R32V3{ Node.translation[0], Node.translation[1], Node.translation[2] };
-		}
+			assert(Node->mNumMeshes == 1);
 
-		if (Node.rotation.size() >= 3)
-		{
-			transform->LocalEulerAngles = R32V3{ Node.rotation[0], Node.rotation[1], Node.rotation[2] };
-		}
-
-		if (Node.scale.size() >= 3)
-		{
-			transform->LocalScale = R32V3{ Node.scale[0], Node.scale[1], Node.scale[2] };
-		}
-
-		if (Node.mesh >= 0)
-		{
-			tinygltf::Mesh const& mesh = mModel.meshes[Node.mesh];
-
-			LOG("Mesh:%s\n", mesh.name.data());
-
-			std::vector<PbrVertex> vertices = {};
-			std::vector<U32> indices = {};
-
-			assert(mesh.primitives.size() == 1);
-
-			for (auto const& primitive : mesh.primitives)
+			for (U32 i = 0; i < Node->mNumMeshes; ++i)
 			{
-				// primitive.mode // TODO
-				// primitive.material // TODO
+				aiMesh const* mesh = Scene->mMeshes[Node->mMeshes[i]];
 
-				for (auto const& [attributeName, attribIndex] : primitive.attributes)
+				assert(mesh->mNumVertices > 0);
+
+				vertices.resize(mesh->mNumVertices);
+
+				for (U32 j = 0; j < mesh->mNumVertices; ++j)
 				{
-					tinygltf::Accessor const& attributeAccessor = mModel.accessors[attribIndex];
-					tinygltf::BufferView const& bufferView = mModel.bufferViews[attributeAccessor.bufferView];
-					tinygltf::Buffer const& buffer = mModel.buffers[bufferView.buffer];
+					if (mesh->HasPositions())
+					{
+						vertices[j].Position = R32V3{ mesh->mVertices[j].x, mesh->mVertices[j].y, mesh->mVertices[j].z };
+					}
 
-					assert(bufferView.target == TINYGLTF_TARGET_ARRAY_BUFFER);
+					if (mesh->HasNormals())
+					{
+						vertices[j].Normal = R32V3{ mesh->mNormals[j].x, mesh->mNormals[j].y, mesh->mNormals[j].z };
+					}
 
-					LOG("  Attribute:%s BufferView:%d Count:%llu ByteOffset:%llu ComponentType:%d Type:%d\n", attributeName.data(), attributeAccessor.bufferView, attributeAccessor.count, attributeAccessor.byteOffset, attributeAccessor.componentType, attributeAccessor.type);
+					if (mesh->HasTangentsAndBitangents())
+					{
+						vertices[j].Tangent = R32V3{ mesh->mTangents[j].x, mesh->mTangents[j].y, mesh->mTangents[j].z };
+						vertices[j].BiTangent = R32V3{ mesh->mBitangents[j].x, mesh->mBitangents[j].y, mesh->mBitangents[j].z };
+					}
 
-					if (attributeName == "POSITION")
+#pragma warning (push)
+#pragma warning (disable : 26819)
+					switch (mesh->GetNumColorChannels())
 					{
-						CONVERT_VERTICES(buffer, attributeAccessor, vertices, Position);
+						case 8: vertices[j].ColorChannel7 = R32V4{ mesh->mColors[7][j].r, mesh->mColors[7][j].g, mesh->mColors[7][j].b, mesh->mColors[7][j].a };
+						case 7: vertices[j].ColorChannel6 = R32V4{ mesh->mColors[6][j].r, mesh->mColors[6][j].g, mesh->mColors[6][j].b, mesh->mColors[6][j].a };
+						case 6: vertices[j].ColorChannel5 = R32V4{ mesh->mColors[5][j].r, mesh->mColors[5][j].g, mesh->mColors[5][j].b, mesh->mColors[5][j].a };
+						case 5: vertices[j].ColorChannel4 = R32V4{ mesh->mColors[4][j].r, mesh->mColors[4][j].g, mesh->mColors[4][j].b, mesh->mColors[4][j].a };
+						case 4: vertices[j].ColorChannel3 = R32V4{ mesh->mColors[3][j].r, mesh->mColors[3][j].g, mesh->mColors[3][j].b, mesh->mColors[3][j].a };
+						case 3: vertices[j].ColorChannel2 = R32V4{ mesh->mColors[2][j].r, mesh->mColors[2][j].g, mesh->mColors[2][j].b, mesh->mColors[2][j].a };
+						case 2: vertices[j].ColorChannel1 = R32V4{ mesh->mColors[1][j].r, mesh->mColors[1][j].g, mesh->mColors[1][j].b, mesh->mColors[1][j].a };
+						case 1: vertices[j].ColorChannel0 = R32V4{ mesh->mColors[0][j].r, mesh->mColors[0][j].g, mesh->mColors[0][j].b, mesh->mColors[0][j].a };
+						case 0: break;
+						default: assert(0); break;
 					}
-					else if (attributeName == "NORMAL")
-					{
-						CONVERT_VERTICES(buffer, attributeAccessor, vertices, Normal);
-					}
-					else if (attributeName == "TEXCOORD_0")
-					{
-						CONVERT_VERTICES(buffer, attributeAccessor, vertices, TexCoord0);
-					}
-					else if (attributeName == "WEIGHTS_0")
-					{
-						CONVERT_VERTICES(buffer, attributeAccessor, vertices, Weight0);
-					}
-					else if (attributeName == "JOINTS_0")
-					{
-						CONVERT_VERTICES(buffer, attributeAccessor, vertices, Joint0);
-					}
-					else
-					{
-						LOG("Missing attribute %s\n", attributeName.data());
 
-						assert(0);
+					switch (mesh->GetNumUVChannels())
+					{
+						case 8: vertices[j].TexCoordChannel7 = R32V3{ mesh->mTextureCoords[7][j].x, mesh->mTextureCoords[7][j].y, mesh->mTextureCoords[7][j].z };
+						case 7: vertices[j].TexCoordChannel6 = R32V3{ mesh->mTextureCoords[6][j].x, mesh->mTextureCoords[6][j].y, mesh->mTextureCoords[6][j].z };
+						case 6: vertices[j].TexCoordChannel5 = R32V3{ mesh->mTextureCoords[5][j].x, mesh->mTextureCoords[5][j].y, mesh->mTextureCoords[5][j].z };
+						case 5: vertices[j].TexCoordChannel4 = R32V3{ mesh->mTextureCoords[4][j].x, mesh->mTextureCoords[4][j].y, mesh->mTextureCoords[4][j].z };
+						case 4: vertices[j].TexCoordChannel3 = R32V3{ mesh->mTextureCoords[3][j].x, mesh->mTextureCoords[3][j].y, mesh->mTextureCoords[3][j].z };
+						case 3: vertices[j].TexCoordChannel2 = R32V3{ mesh->mTextureCoords[2][j].x, mesh->mTextureCoords[2][j].y, mesh->mTextureCoords[2][j].z };
+						case 2: vertices[j].TexCoordChannel1 = R32V3{ mesh->mTextureCoords[1][j].x, mesh->mTextureCoords[1][j].y, mesh->mTextureCoords[1][j].z };
+						case 1: vertices[j].TexCoordChannel0 = R32V3{ mesh->mTextureCoords[0][j].x, mesh->mTextureCoords[0][j].y, mesh->mTextureCoords[0][j].z };
+						case 0: break;
+						default: assert(0); break;
 					}
+#pragma warning (pop)
 				}
 
-				tinygltf::Accessor const& indexAccessor = mModel.accessors[primitive.indices];
-				tinygltf::BufferView const& bufferView = mModel.bufferViews[indexAccessor.bufferView];
-				tinygltf::Buffer const& buffer = mModel.buffers[bufferView.buffer];
+				indices.resize(mesh->mNumFaces * 3);
 
-				assert(bufferView.target == TINYGLTF_TARGET_ELEMENT_ARRAY_BUFFER);
+				for (U32 j = 0, k = 0; j < mesh->mNumFaces; ++j, k += 3)
+				{
+					aiFace const face = mesh->mFaces[j];
 
-				LOG("  Indices BufferView:%d Count:%llu ByteOffset:%llu ComponentType:%d Type:%d\n", indexAccessor.bufferView, indexAccessor.count, indexAccessor.byteOffset, indexAccessor.componentType, indexAccessor.type);
+					assert(face.mNumIndices == 3);
 
-				CONVERT_INDICES(buffer, indexAccessor, indices);
+					indices[k + 0] = face.mIndices[0];
+					indices[k + 1] = face.mIndices[1];
+					indices[k + 2] = face.mIndices[2];
+				}
+
+				Buffer* vertexBuffer = BufferVariance::CreateVertex(vertices.data(), sizeof(PhysicallyBasedVertex) * vertices.size());
+				Buffer* indexBuffer = BufferVariance::CreateIndex(indices.data(), sizeof(U32) * indices.size());
+
+				mSharedVertexBuffers[entity] = vertexBuffer;
+				mSharedIndexBuffers[entity] = indexBuffer;
+
+				Renderable* renderable = entity->AttachComponent<Renderable>();
+
+				renderable->SetSharedVertexBuffer(vertexBuffer);
+				renderable->SetSharedIndexBuffer(indexBuffer);
 			}
-
-			LOG("\n");
-
-			Buffer* vertexBuffer = BufferVariance::CreateVertex(vertices.data(), vertices.size());
-			Buffer* indexBuffer = BufferVariance::CreateIndex(indices.data(), indices.size());
-
-			mSharedVertexBuffers[entity] = vertexBuffer;
-			mSharedIndexBuffers[entity] = indexBuffer;
-
-			Renderable* renderable = entity->AttachComponent<Renderable>();
-
-			renderable->SetSharedVertexBuffer(vertexBuffer);
-			renderable->SetSharedIndexBuffer(indexBuffer);
 		}
 
-		for (auto const& childNode : Node.children)
+		for (U32 i = 0; i < Node->mNumChildren; ++i)
 		{
-			LoadNodesRecursive(mModel.nodes[childNode], entity);
+			LoadNodesRecursive(Scene, Node->mChildren[i], entity);
 		}
 	}
 
@@ -335,6 +214,31 @@ namespace hyperion
 	void Scene::PrintHierarchy()
 	{
 		mTransformHierarchy.Print();
+	}
+
+	void Scene::Commit()
+	{
+		mEntitiesToBeRendered.clear();
+		mEntitiesToBeComputed.clear();
+
+		for (auto const& entity : mEntities)
+		{
+			Renderable* renderable = entity->GetComponent<Renderable>();
+
+			if (renderable)
+			{
+				mEntitiesToBeRendered.emplace_back(entity);
+			}
+		}
+
+		U32 entitiesToBeRenderedCount = (U32)mEntitiesToBeRendered.size();
+
+		gRenderer->BuildPhysicallBasedDescriptorSets(entitiesToBeRenderedCount);
+
+		for (U32 i = 0; i < entitiesToBeRenderedCount; ++i)
+		{
+			gRenderer->UpdatePhysicallyBasedDescriptorSets(i);
+		}
 	}
 
 	void Scene::Update()

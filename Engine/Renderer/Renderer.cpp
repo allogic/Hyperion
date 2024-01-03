@@ -9,6 +9,7 @@
 #include <Engine/Ecs/Transform.h>
 
 #include <Engine/Ecs/Components/Camera.h>
+#include <Engine/Ecs/Components/Renderable.h>
 
 #include <Engine/Interface/FontAtlas.h>
 
@@ -44,9 +45,14 @@ namespace hyperion
 		CreateRenderPass();
 		CreateFrameBuffer();
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		CreateQueryPool();
 #endif
+
+		mPhysicallyBasedDescriptorPool = Pipeline::CreateDescriptorPool(1024, mPhysicallyBasedDescriptorSetLayoutBindings);
+		mPhysicallyBasedDescriptorSetLayout = Pipeline::CreateDescriptorSetLayout(mPhysicallyBasedDescriptorSetLayoutBindings);
+		mPhysicallyBasedPipelineLayout = Pipeline::CreatePipelineLayout(mPhysicallyBasedDescriptorSetLayout, mPhysicallyBasedPushConstantRanges);
+		mPhysicallyBasedPipeline = Pipeline::CreateGraphicPipeline(mPhysicallyBasedPipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, mPhysicallyBasedVertexFile, mPhysicallyBasedFragmentFile, mPhysicallyBasedVertexInputBindingDescriptions, mPhysicallyBasedVertexInputAttributeDescriptions);
 
 		mTextDescriptorPool = Pipeline::CreateDescriptorPool(1, mTextDescriptorSetLayoutBindings);
 		mTextDescriptorSetLayout = Pipeline::CreateDescriptorSetLayout(mTextDescriptorSetLayoutBindings);
@@ -78,7 +84,7 @@ namespace hyperion
 		DestroyDescriptorSetLayout();
 		DestroyDescriptorPool();
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		DestroyQueryPool();
 #endif
 
@@ -97,7 +103,7 @@ namespace hyperion
 		delete mDebugVertexBuffer;
 		delete mDebugIndexBuffer;
 
-		delete mFontAtlas;
+		delete mFontAtlasImage;
 	}
 
 	void Renderer::CreateCommandBuffer()
@@ -207,7 +213,7 @@ namespace hyperion
 		}
 	}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	void Renderer::CreateQueryPool()
 	{
 		VkQueryPoolCreateInfo queryPoolCreateInfo = {};
@@ -253,12 +259,13 @@ namespace hyperion
 
 	void Renderer::DestroyDescriptorPool()
 	{
+		vkDestroyDescriptorPool(gWindow->GetDevice(), mPhysicallyBasedDescriptorPool, 0);
 		vkDestroyDescriptorPool(gWindow->GetDevice(), mTextDescriptorPool, 0);
 		vkDestroyDescriptorPool(gWindow->GetDevice(), mInterfaceDescriptorPool, 0);
 		vkDestroyDescriptorPool(gWindow->GetDevice(), mDebugDescriptorPool, 0);
 	}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 	void Renderer::DestroyQueryPool()
 	{
 		vkDestroyQueryPool(gWindow->GetDevice(), mQueryPool, 0);
@@ -267,6 +274,7 @@ namespace hyperion
 
 	void Renderer::DestroyDescriptorSetLayout()
 	{
+		vkDestroyDescriptorSetLayout(gWindow->GetDevice(), mPhysicallyBasedDescriptorSetLayout, 0);
 		vkDestroyDescriptorSetLayout(gWindow->GetDevice(), mTextDescriptorSetLayout, 0);
 		vkDestroyDescriptorSetLayout(gWindow->GetDevice(), mInterfaceDescriptorSetLayout, 0);
 		vkDestroyDescriptorSetLayout(gWindow->GetDevice(), mDebugDescriptorSetLayout, 0);
@@ -274,6 +282,7 @@ namespace hyperion
 
 	void Renderer::DestroyPipelineLayout()
 	{
+		vkDestroyPipelineLayout(gWindow->GetDevice(), mPhysicallyBasedPipelineLayout, 0);
 		vkDestroyPipelineLayout(gWindow->GetDevice(), mTextPipelineLayout, 0);
 		vkDestroyPipelineLayout(gWindow->GetDevice(), mInterfacePipelineLayout, 0);
 		vkDestroyPipelineLayout(gWindow->GetDevice(), mDebugPipelineLayout, 0);
@@ -281,9 +290,25 @@ namespace hyperion
 
 	void Renderer::DestroyPipeline()
 	{
+		vkDestroyPipeline(gWindow->GetDevice(), mPhysicallyBasedPipeline, 0);
 		vkDestroyPipeline(gWindow->GetDevice(), mTextPipeline, 0);
 		vkDestroyPipeline(gWindow->GetDevice(), mInterfacePipeline, 0);
 		vkDestroyPipeline(gWindow->GetDevice(), mDebugPipeline, 0);
+	}
+
+	void Renderer::BuildPhysicallBasedDescriptorSets(U32 DescriptorCount)
+	{
+		mPhysicallyBasedDescriptorSets.resize(DescriptorCount);
+
+		auto descriptorSetLayouts = std::vector<VkDescriptorSetLayout>{ DescriptorCount, mPhysicallyBasedDescriptorSetLayout };
+
+		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
+		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		descriptorSetAllocateInfo.descriptorSetCount = DescriptorCount;
+		descriptorSetAllocateInfo.descriptorPool = mPhysicallyBasedDescriptorPool;
+		descriptorSetAllocateInfo.pSetLayouts = descriptorSetLayouts.data();
+
+		VK_CHECK(vkAllocateDescriptorSets(gWindow->GetDevice(), &descriptorSetAllocateInfo, mPhysicallyBasedDescriptorSets.data()));
 	}
 
 	void Renderer::BuildTextDescriptorSets(U32 DescriptorCount)
@@ -331,6 +356,46 @@ namespace hyperion
 		VK_CHECK(vkAllocateDescriptorSets(gWindow->GetDevice(), &descriptorSetAllocateInfo, mDebugDescriptorSets.data()));
 	}
 
+	void Renderer::UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex)
+	{
+		VkDescriptorBufferInfo timeInfoDescriptorBufferInfo = {};
+		timeInfoDescriptorBufferInfo.offset = 0;
+		timeInfoDescriptorBufferInfo.buffer = mTimeInfoBuffer->GetBuffer();
+		timeInfoDescriptorBufferInfo.range = mTimeInfoBuffer->GetSize();
+
+		VkDescriptorBufferInfo viewProjectionDescriptorBufferInfo = {};
+		viewProjectionDescriptorBufferInfo.offset = 0;
+		viewProjectionDescriptorBufferInfo.buffer = mViewProjectionBuffer->GetBuffer();
+		viewProjectionDescriptorBufferInfo.range = mViewProjectionBuffer->GetSize();
+
+		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {};
+		writeDescriptorSets.resize(mPhysicallyBasedDescriptorSetLayoutBindings.size());
+
+		writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[0].pNext = 0;
+		writeDescriptorSets[0].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[0].dstBinding = 0;
+		writeDescriptorSets[0].dstArrayElement = 0;
+		writeDescriptorSets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		writeDescriptorSets[0].descriptorCount = 1;
+		writeDescriptorSets[0].pImageInfo = 0;
+		writeDescriptorSets[0].pBufferInfo = &timeInfoDescriptorBufferInfo;
+		writeDescriptorSets[0].pTexelBufferView = 0;
+
+		writeDescriptorSets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[1].pNext = 0;
+		writeDescriptorSets[1].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[1].dstBinding = 1;
+		writeDescriptorSets[1].dstArrayElement = 0;
+		writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		writeDescriptorSets[1].descriptorCount = 1;
+		writeDescriptorSets[1].pImageInfo = 0;
+		writeDescriptorSets[1].pBufferInfo = &viewProjectionDescriptorBufferInfo;
+		writeDescriptorSets[1].pTexelBufferView = 0;
+
+		vkUpdateDescriptorSets(gWindow->GetDevice(), (U32)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, 0);
+	}
+
 	void Renderer::UpdateTextDescriptorSets(U32 DescriptorIndex)
 	{
 		VkDescriptorBufferInfo timeInfoDescriptorBufferInfo = {};
@@ -350,8 +415,8 @@ namespace hyperion
 
 		VkDescriptorImageInfo fontAtlasDescriptorImageInfo = {};
 		fontAtlasDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-		fontAtlasDescriptorImageInfo.imageView = mFontAtlas->GetImageView();
-		fontAtlasDescriptorImageInfo.sampler = mFontAtlas->GetSampler();
+		fontAtlasDescriptorImageInfo.imageView = mFontAtlasImage->GetImageView();
+		fontAtlasDescriptorImageInfo.sampler = mFontAtlasImage->GetSampler();
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {};
 		writeDescriptorSets.resize(mTextDescriptorSetLayoutBindings.size());
@@ -552,9 +617,39 @@ namespace hyperion
 		vkCmdSetViewport(mGraphicCommandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(mGraphicCommandBuffer, 0, 1, &scissor);
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		vkCmdWriteTimestamp(mGraphicCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 0);
 #endif
+
+		{
+			vkCmdBindPipeline(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipeline);
+
+			auto const& entities = Scene->GetEntitiesToBeRendered();
+
+			for (U32 i = 0; i < entities.size(); ++i)
+			{
+				Renderable* renderable = entities[i]->GetComponent<Renderable>();
+
+				if (renderable)
+				{
+					Buffer* sharedVertexBuffer = renderable->GetSharedVertexBuffer();
+					Buffer* sharedIndexBuffer = renderable->GetSharedIndexBuffer();
+
+					std::vector<VkBuffer> defaultVertexBuffers = { sharedVertexBuffer->GetBuffer() };
+					std::vector<U64> defaultOffsets = { 0 };
+
+					vkCmdBindDescriptorSets(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipelineLayout, 0, 1, &mPhysicallyBasedDescriptorSets[i], 0, 0);
+					vkCmdBindVertexBuffers(mGraphicCommandBuffer, PhysicallyBasedVertexBindingId, 1, defaultVertexBuffers.data(), defaultOffsets.data());
+					vkCmdBindIndexBuffer(mGraphicCommandBuffer, sharedIndexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+					//vkCmdPushConstants(mGraphicCommandBuffer, mPhysicallyBasedPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PerEntityData), &perEntityData);
+
+					U32 indexCount = (U32)(sharedIndexBuffer->GetSize() / sizeof(U32));
+
+					vkCmdDrawIndexed(mGraphicCommandBuffer, indexCount, 1, 0, 0, 0);
+				}
+			}
+		}
 
 		{
 			vkCmdBindPipeline(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mDebugPipeline);
@@ -601,7 +696,7 @@ namespace hyperion
 			vkCmdDrawIndexed(mGraphicCommandBuffer, mTextIndexCount, 1, 0, 0, 0);
 		}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		vkCmdWriteTimestamp(mGraphicCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 1);
 #endif
 
@@ -621,7 +716,7 @@ namespace hyperion
 
 		VK_CHECK(vkBeginCommandBuffer(mComputeCommandBuffer, &commandBufferBeginInfo));
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 2);
 #endif
 
@@ -630,7 +725,7 @@ namespace hyperion
 			Scene->DispatchTransformHierarchy();
 		}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		vkCmdWriteTimestamp(mComputeCommandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, mQueryPool, 3);
 #endif
 
@@ -650,6 +745,7 @@ namespace hyperion
 		CreateRenderPass();
 		CreateFrameBuffer();
 
+		mPhysicallyBasedPipeline = Pipeline::CreateGraphicPipeline(mPhysicallyBasedPipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, mPhysicallyBasedVertexFile, mPhysicallyBasedFragmentFile, mPhysicallyBasedVertexInputBindingDescriptions, mPhysicallyBasedVertexInputAttributeDescriptions);
 		mTextPipeline = Pipeline::CreateGraphicPipeline(mTextPipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, mTextVertexFile, mTextFragmentFile, mTextVertexInputBindingDescriptions, mTextVertexInputAttributeDescriptions);
 		mInterfacePipeline = Pipeline::CreateGraphicPipeline(mInterfacePipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, mInterfaceVertexFile, mInterfaceFragmentFile, mInterfaceVertexInputBindingDescriptions, mInterfaceVertexInputAttributeDescriptions);
 		mDebugPipeline = Pipeline::CreateGraphicPipeline(mDebugPipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_LINE_LIST, mDebugVertexFile, mDebugFragmentFile, mDebugVertexInputBindingDescriptions, mDebugVertexInputAttributeDescriptions);
@@ -737,7 +833,7 @@ namespace hyperion
 			VK_CHECK(vkQueuePresentKHR(gWindow->GetPresentQueue(), &presentInfo));
 		}
 
-#ifdef NDEBUG
+#ifdef _DEBUG
 		std::array<U64, 4> queryResults = {};
 
 		vkGetQueryPoolResults(gWindow->GetDevice(), gRenderer->mQueryPool, 0, 4, sizeof(U64) * queryResults.size(), queryResults.data(), sizeof(U64), VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
@@ -767,12 +863,12 @@ namespace hyperion
 
 	void Renderer::UpdateFontAtlas(U32 Width, U32 Height, std::vector<U8> const& Atlas)
 	{
-		if (mFontAtlas)
+		if (mFontAtlasImage)
 		{
-			delete mFontAtlas;
+			delete mFontAtlasImage;
 		}
 
-		mFontAtlas = ImageVariance::CreateRImage2D((void*)Atlas.data(), Width, Height);
+		mFontAtlasImage = ImageVariance::CreateRImage2D((void*)Atlas.data(), Width, Height);
 	}
 
 	void Renderer::SetFontInfo(std::string const& Font, FontInfo const& Info)
@@ -854,23 +950,23 @@ namespace hyperion
 					R32 w = characterInfo.Size.x * Scale;
 					R32 h = characterInfo.Size.y * Scale;
 
-					R32V2 atlasPos = { 1.0F / fontInfo.FontSize.x * fontInfo.CharacterSize.x * c, 1.0F / fontCount * fontInfo.FontIndex };
-					R32V2 atlasSize = { 1.0F / fontInfo.FontSize.x * characterInfo.Size.x, 1.0F / fontCount / fontInfo.FontSize.y * characterInfo.Size.y };
+					R32V2 atlasSubPos = { 1.0F / fontInfo.FontSize.x * fontInfo.CharacterSize.x * c, 1.0F / fontCount * fontInfo.FontIndex };
+					R32V2 atlasSubSize = { 1.0F / fontInfo.FontSize.x * characterInfo.Size.x, 1.0F / fontCount / fontInfo.FontSize.y * characterInfo.Size.y };
 
 					vertices[gRenderer->mTextVertexCount + 0].Position = R32V3{ x, y, z };
 					vertices[gRenderer->mTextVertexCount + 1].Position = R32V3{ x + w, y, z };
 					vertices[gRenderer->mTextVertexCount + 2].Position = R32V3{ x, y + h, z };
 					vertices[gRenderer->mTextVertexCount + 3].Position = R32V3{ x + w, y + h, z };
 
-					vertices[gRenderer->mTextVertexCount + 0].Uv = R32V2{ atlasPos.x, atlasPos.y + atlasSize.y };
-					vertices[gRenderer->mTextVertexCount + 1].Uv = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y + atlasSize.y };
-					vertices[gRenderer->mTextVertexCount + 2].Uv = R32V2{ atlasPos.x, atlasPos.y };
-					vertices[gRenderer->mTextVertexCount + 3].Uv = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y };
+					vertices[gRenderer->mTextVertexCount + 0].TexCoordChannel0 = R32V2{ atlasSubPos.x, atlasSubPos.y + atlasSubSize.y };
+					vertices[gRenderer->mTextVertexCount + 1].TexCoordChannel0 = R32V2{ atlasSubPos.x + atlasSubSize.x, atlasSubPos.y + atlasSubSize.y };
+					vertices[gRenderer->mTextVertexCount + 2].TexCoordChannel0 = R32V2{ atlasSubPos.x, atlasSubPos.y };
+					vertices[gRenderer->mTextVertexCount + 3].TexCoordChannel0 = R32V2{ atlasSubPos.x + atlasSubSize.x, atlasSubPos.y };
 
-					vertices[gRenderer->mTextVertexCount + 0].Color = Color;
-					vertices[gRenderer->mTextVertexCount + 1].Color = Color;
-					vertices[gRenderer->mTextVertexCount + 2].Color = Color;
-					vertices[gRenderer->mTextVertexCount + 3].Color = Color;
+					vertices[gRenderer->mTextVertexCount + 0].ColorChannel0 = Color;
+					vertices[gRenderer->mTextVertexCount + 1].ColorChannel0 = Color;
+					vertices[gRenderer->mTextVertexCount + 2].ColorChannel0 = Color;
+					vertices[gRenderer->mTextVertexCount + 3].ColorChannel0 = Color;
 
 					indices[gRenderer->mTextIndexCount + 0] = gRenderer->mTextVertexCount + 0;
 					indices[gRenderer->mTextIndexCount + 1] = gRenderer->mTextVertexCount + 2;
@@ -911,15 +1007,15 @@ namespace hyperion
 				vertices[gRenderer->mTextVertexCount + 2].Position = R32V3{ x, y + h, z };
 				vertices[gRenderer->mTextVertexCount + 3].Position = R32V3{ x + w, y + h, z };
 
-				vertices[gRenderer->mTextVertexCount + 0].Uv = R32V2{ atlasPos.x, atlasPos.y + atlasSize.y };
-				vertices[gRenderer->mTextVertexCount + 1].Uv = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y + atlasSize.y };
-				vertices[gRenderer->mTextVertexCount + 2].Uv = R32V2{ atlasPos.x, atlasPos.y };
-				vertices[gRenderer->mTextVertexCount + 3].Uv = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y };
+				vertices[gRenderer->mTextVertexCount + 0].TexCoordChannel0 = R32V2{ atlasPos.x, atlasPos.y + atlasSize.y };
+				vertices[gRenderer->mTextVertexCount + 1].TexCoordChannel0 = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y + atlasSize.y };
+				vertices[gRenderer->mTextVertexCount + 2].TexCoordChannel0 = R32V2{ atlasPos.x, atlasPos.y };
+				vertices[gRenderer->mTextVertexCount + 3].TexCoordChannel0 = R32V2{ atlasPos.x + atlasSize.x, atlasPos.y };
 
-				vertices[gRenderer->mTextVertexCount + 0].Color = Color;
-				vertices[gRenderer->mTextVertexCount + 1].Color = Color;
-				vertices[gRenderer->mTextVertexCount + 2].Color = Color;
-				vertices[gRenderer->mTextVertexCount + 3].Color = Color;
+				vertices[gRenderer->mTextVertexCount + 0].ColorChannel0 = Color;
+				vertices[gRenderer->mTextVertexCount + 1].ColorChannel0 = Color;
+				vertices[gRenderer->mTextVertexCount + 2].ColorChannel0 = Color;
+				vertices[gRenderer->mTextVertexCount + 3].ColorChannel0 = Color;
 
 				indices[gRenderer->mTextIndexCount + 0] = gRenderer->mTextVertexCount + 0;
 				indices[gRenderer->mTextIndexCount + 1] = gRenderer->mTextVertexCount + 2;
@@ -946,15 +1042,15 @@ namespace hyperion
 		vertices[gRenderer->mInterfaceVertexCount + 2].Position = R32V3{ Position.x, Position.y + Size.y, Position.z };
 		vertices[gRenderer->mInterfaceVertexCount + 3].Position = R32V3{ Position.x + Size.x, Position.y + Size.y, Position.z };
 
-		vertices[gRenderer->mInterfaceVertexCount + 0].Uv = R32V2{ 0.0F, 0.0F };
-		vertices[gRenderer->mInterfaceVertexCount + 1].Uv = R32V2{ 1.0F, 0.0F };
-		vertices[gRenderer->mInterfaceVertexCount + 2].Uv = R32V2{ 0.0F, 1.0F };
-		vertices[gRenderer->mInterfaceVertexCount + 3].Uv = R32V2{ 1.0F, 1.0F };
+		vertices[gRenderer->mInterfaceVertexCount + 0].TexCoordChannel0 = R32V2{ 0.0F, 0.0F };
+		vertices[gRenderer->mInterfaceVertexCount + 1].TexCoordChannel0 = R32V2{ 1.0F, 0.0F };
+		vertices[gRenderer->mInterfaceVertexCount + 2].TexCoordChannel0 = R32V2{ 0.0F, 1.0F };
+		vertices[gRenderer->mInterfaceVertexCount + 3].TexCoordChannel0 = R32V2{ 1.0F, 1.0F };
 
-		vertices[gRenderer->mInterfaceVertexCount + 0].Color = Color;
-		vertices[gRenderer->mInterfaceVertexCount + 1].Color = Color;
-		vertices[gRenderer->mInterfaceVertexCount + 2].Color = Color;
-		vertices[gRenderer->mInterfaceVertexCount + 3].Color = Color;
+		vertices[gRenderer->mInterfaceVertexCount + 0].ColorChannel0 = Color;
+		vertices[gRenderer->mInterfaceVertexCount + 1].ColorChannel0 = Color;
+		vertices[gRenderer->mInterfaceVertexCount + 2].ColorChannel0 = Color;
+		vertices[gRenderer->mInterfaceVertexCount + 3].ColorChannel0 = Color;
 
 		U16* indices = gRenderer->mInterfaceIndexBuffer->GetMappedData<U16>();
 
@@ -977,8 +1073,8 @@ namespace hyperion
 		vertices[gRenderer->mDebugVertexCount + 0].Position = From;
 		vertices[gRenderer->mDebugVertexCount + 1].Position = To;
 
-		vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
+		vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
 
 		U16* indices = gRenderer->mDebugIndexBuffer->GetMappedData<U16>();
 
@@ -1000,10 +1096,10 @@ namespace hyperion
 		vertices[gRenderer->mDebugVertexCount + 2].Position = Position + R32V3{ -half.x,  half.y, 0.0F } * Rotation;
 		vertices[gRenderer->mDebugVertexCount + 3].Position = Position + R32V3{  half.x,  half.y, 0.0F } * Rotation;
 
-		vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 2].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 3].Color = Color;
+		vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 2].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 3].ColorChannel0 = Color;
 
 		U16* indices = gRenderer->mDebugIndexBuffer->GetMappedData<U16>();
 
@@ -1031,10 +1127,10 @@ namespace hyperion
 		vertices[gRenderer->mDebugVertexCount + 2].Position = Position + R32V3{ -half.x, 0.0F,  half.z } *Rotation;
 		vertices[gRenderer->mDebugVertexCount + 3].Position = Position + R32V3{  half.x, 0.0F,  half.z } *Rotation;
 
-		vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 2].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 3].Color = Color;
+		vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 2].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 3].ColorChannel0 = Color;
 
 		U16* indices = gRenderer->mDebugIndexBuffer->GetMappedData<U16>();
 
@@ -1067,8 +1163,8 @@ namespace hyperion
 			vertices[gRenderer->mDebugVertexCount + 0].Position = Position + R32V3{ -half, 0.0F, positionZ } * Rotation;
 			vertices[gRenderer->mDebugVertexCount + 1].Position = Position + R32V3{  half, 0.0F, positionZ } * Rotation;
 
-			vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-			vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
+			vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+			vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
 
 			indices[gRenderer->mDebugIndexCount + 0] = gRenderer->mDebugVertexCount + 0;
 			indices[gRenderer->mDebugIndexCount + 1] = gRenderer->mDebugVertexCount + 1;
@@ -1084,8 +1180,8 @@ namespace hyperion
 			vertices[gRenderer->mDebugVertexCount + 0].Position = Position + R32V3{ positionX, 0.0F, -half } * Rotation;
 			vertices[gRenderer->mDebugVertexCount + 1].Position = Position + R32V3{ positionX, 0.0F,  half } * Rotation;
 
-			vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-			vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
+			vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+			vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
 
 			indices[gRenderer->mDebugIndexCount + 0] = gRenderer->mDebugVertexCount + 0;
 			indices[gRenderer->mDebugIndexCount + 1] = gRenderer->mDebugVertexCount + 1;
@@ -1111,15 +1207,15 @@ namespace hyperion
 		vertices[gRenderer->mDebugVertexCount + 6].Position = Position + R32V3{ -half.x,  half.y,  half.z } * Rotation;
 		vertices[gRenderer->mDebugVertexCount + 7].Position = Position + R32V3{  half.x,  half.y,  half.z } * Rotation;
 
-		vertices[gRenderer->mDebugVertexCount + 0].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 1].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 2].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 3].Color = Color;
+		vertices[gRenderer->mDebugVertexCount + 0].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 1].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 2].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 3].ColorChannel0 = Color;
 
-		vertices[gRenderer->mDebugVertexCount + 4].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 5].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 6].Color = Color;
-		vertices[gRenderer->mDebugVertexCount + 7].Color = Color;
+		vertices[gRenderer->mDebugVertexCount + 4].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 5].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 6].ColorChannel0 = Color;
+		vertices[gRenderer->mDebugVertexCount + 7].ColorChannel0 = Color;
 
 		U16* indices = gRenderer->mDebugIndexBuffer->GetMappedData<U16>();
 

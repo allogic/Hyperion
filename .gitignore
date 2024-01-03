@@ -397,11 +397,18 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Raw text files
+*.txt
+
+# Static libraries
+*.lib
+
 # SPIR-V
 *.spv
 
 # 3D Models
 *.gltf
+*.glb
 *.bin
 *.jpeg
 *.jpg

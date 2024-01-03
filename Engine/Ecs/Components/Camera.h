@@ -49,8 +49,8 @@ namespace hyperion
 	private:
 
 		R32 mFov = glm::radians(45.0F);
-		R32 mNear = 0.001F;
-		R32 mFar = 1000.0F;
+		R32 mNear = 0.0001F;
+		R32 mFar = 10000.0F;
 
 	private:
 
