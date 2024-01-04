@@ -121,12 +121,12 @@ void main()
 			if (transform.worldSpace == 1)
 			{
 				transformBuffer.transforms[transformIndex].worldRotation = multiplyQuaternions(localRotation, parentTransform.worldRotation);
-				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.localRotation, transform.localPosition);
+				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.localRotation, transform.localPosition) * transform.localScale;
 			}
 			else
 			{
 				transformBuffer.transforms[transformIndex].worldRotation = multiplyQuaternions(localRotation, parentTransform.worldRotation);
-				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.worldRotation, -transform.localPosition);
+				transformBuffer.transforms[transformIndex].worldPosition = parentTransform.worldPosition + rotateVectorByQuaternion(transform.worldRotation, -transform.localPosition) * transform.localScale;
 			}
 		}
 	}

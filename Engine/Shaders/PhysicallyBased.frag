@@ -21,9 +21,18 @@ layout(location = 17) in vec3 inputTexCoordChannel5;
 layout(location = 18) in vec3 inputTexCoordChannel6;
 layout(location = 19) in vec3 inputTexCoordChannel7;
 
+layout(binding = 2) uniform sampler2D textureBaseColorSampler;
+layout(binding = 3) uniform sampler2D textureNormalCameraSampler;
+layout(binding = 4) uniform sampler2D textureEmissionColorSampler;
+layout(binding = 5) uniform sampler2D textureMetallnessSampler;
+layout(binding = 6) uniform sampler2D textureDiffuseRoughnessSampler;
+layout(binding = 7) uniform sampler2D textureAmbientOcclusionSampler;
+
 layout(location = 0) out vec4 outputColor;
 
 void main()
 {
-	outputColor = vec4(inputNormal.xy, 0.0, 1.0);
+	vec4 emissionColor = texture(textureEmissionColorSampler, inputTexCoordChannel0.xy);
+
+	outputColor = vec4(emissionColor.xyz, 1.0);
 }

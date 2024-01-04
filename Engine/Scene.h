@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <future>
 
 #include <Engine/Forward.h>
 
@@ -20,9 +21,20 @@
 
 struct aiScene;
 struct aiNode;
+struct aiMaterial;
+
+enum aiTextureType;
 
 namespace hyperion
 {
+	struct AsyncMaterialImageResource
+	{
+		U32 Width;
+		U32 Height;
+		U32 Channels;
+		U8* Data;
+	};
+
 	constexpr R32V3 WorldRight = { 1.0F, 0.0F, 0.0F };
 	constexpr R32V3 WorldLeft = { -1.0F, 0.0F, 0.0F };
 	constexpr R32V3 WorldUp = { 0.0F, 1.0F, 0.0F };
@@ -52,7 +64,11 @@ namespace hyperion
 
 	private:
 
+		void LoadMaterials(aiScene const* Scene);
 		void LoadNodesRecursive(aiScene const* Scene, aiNode const* Node, Entity* Parent = 0);
+
+		AsyncMaterialImageResource LoadImageOfType(aiScene const* Scene, aiMaterial const* Material, aiTextureType Type);
+		Image* ExchangeResourceForImageAndRelease(AsyncMaterialImageResource const& Resource);
 
 	public:
 
@@ -83,6 +99,10 @@ namespace hyperion
 
 		std::map<Entity*, Buffer*> mSharedVertexBuffers = {};
 		std::map<Entity*, Buffer*> mSharedIndexBuffers = {};
+
+		std::vector<Material*> mSharedMaterials = {};
+
+		std::vector<std::future<AsyncMaterialImageResource>> mAsyncMaterialImageResources = {};
 
 	private:
 

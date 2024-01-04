@@ -48,10 +48,24 @@ namespace hyperion
 	{
 		VkDescriptorSetLayout descriptorSetLayout = 0;
 
+		std::vector<VkDescriptorBindingFlags> descriptorBindingFlags = {};
+		descriptorBindingFlags.resize(DescriptorSetLayoutBindings.size());
+
+		for (U32 i = 0; i < (U32)DescriptorSetLayoutBindings.size(); ++i)
+		{
+			descriptorBindingFlags[i] = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT;
+		}
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo descriptorSetLayoutBindingFlagsCreateInfo = {};
+		descriptorSetLayoutBindingFlagsCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
+		descriptorSetLayoutBindingFlagsCreateInfo.pBindingFlags = descriptorBindingFlags.data();
+		descriptorSetLayoutBindingFlagsCreateInfo.bindingCount = (U32)DescriptorSetLayoutBindings.size();
+
 		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {};
 		descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		descriptorSetLayoutCreateInfo.pBindings = DescriptorSetLayoutBindings.data();
 		descriptorSetLayoutCreateInfo.bindingCount = (U32)DescriptorSetLayoutBindings.size();
+		descriptorSetLayoutCreateInfo.pNext = &descriptorSetLayoutBindingFlagsCreateInfo;
 
 		VK_CHECK(vkCreateDescriptorSetLayout(gWindow->GetDevice(), &descriptorSetLayoutCreateInfo, 0, &descriptorSetLayout));
 

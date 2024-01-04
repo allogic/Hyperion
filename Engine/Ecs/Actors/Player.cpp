@@ -15,11 +15,6 @@ namespace hyperion
 	Player::Player(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
 	{
 		mCamera = GetScene()->GetCamera(this);
-		mTransform = GetScene()->GetTransform(this);
-
-		mTransform->LocalPosition = R32V3{ 0.0F, 0.0F, 0.0F };
-		mTransform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
-		mTransform->LocalScale = R32V3{ 0.0F, 0.0F, 0.0F };
 	}
 
 	Player::~Player()
@@ -37,62 +32,61 @@ namespace hyperion
 
 	void Player::HandlePosition()
 	{
-		static R32V3 velocity = {};
+		Transform* transform = GetScene()->GetTransform(this);
 
 		R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mKeyboardMoveSpeedFast : mKeyboardMoveSpeedNormal;
 
-		if (Window::KeyHeld(KeyCode::KeyD)) velocity += mTransform->LocalRight * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyA)) velocity -= mTransform->LocalRight * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyE)) velocity += WorldUp * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyQ)) velocity -= WorldUp * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyW)) velocity += mTransform->LocalFront * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyS)) velocity -= mTransform->LocalFront * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyD)) mVelocity += transform->LocalRight * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyA)) mVelocity -= transform->LocalRight * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyE)) mVelocity += WorldUp * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyQ)) mVelocity -= WorldUp * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyW)) mVelocity += transform->LocalFront * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyS)) mVelocity -= transform->LocalFront * speed * Window::GetDeltaTime();
 
-		velocity += -velocity * mMoveDrag * Window::GetDeltaTime();
+		mVelocity += -mVelocity * mMoveDrag * Window::GetDeltaTime();
 
-		mTransform->LocalPosition += (mTransform->LocalRotation * velocity);
+		transform->LocalPosition += transform->LocalRotation * mVelocity;
 	}
 
 	void Player::HandleRotation()
 	{
-		static R32V2 mousePositionStart = {};
-		static R32V2 mousePositionDelta = {};
+		Transform* transform = GetScene()->GetTransform(this);
 
 		if (Window::RightMouseDown())
 		{
-			mousePositionStart = Window::GetMousePosition();
+			mMousePositionStart = Window::GetMousePosition();
 		}
 
 		if (Window::RightMouseHeld() && Window::LeftMouseHeld())
 		{
-			mousePositionDelta = mousePositionStart - Window::GetMousePosition();
+			mMousePositionDelta = mMousePositionStart - Window::GetMousePosition();
 
 			R32V3 positionOffset = {};
 
 			R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mMouseMoveSpeedFast : mMouseMoveSpeedNormal;
 
-			positionOffset += WorldRight * mousePositionDelta.x * speed * Window::GetDeltaTime();
-			positionOffset += WorldUp * mousePositionDelta.y * speed * Window::GetDeltaTime();
+			positionOffset += WorldUp * mMousePositionDelta.y * speed * Window::GetDeltaTime();
+			positionOffset += transform->LocalRight * mMousePositionDelta.x * speed * Window::GetDeltaTime();
 
-			mTransform->LocalPosition += positionOffset;
+			transform->LocalPosition += transform->LocalRotation * positionOffset;
 		}
 		else if (Window::RightMouseHeld())
 		{
-			mousePositionDelta = mousePositionStart - Window::GetMousePosition();
+			mMousePositionDelta = mMousePositionStart - Window::GetMousePosition();
 
-			R32V3 eulerAngles = mTransform->LocalEulerAngles;
+			R32V3 eulerAngles = transform->LocalEulerAngles;
 
 			R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mMouseRotationSpeedFast : mMouseRotationSpeedNormal;
 
-			eulerAngles.x -= mousePositionDelta.y * speed * Window::GetDeltaTime();
-			eulerAngles.y += mousePositionDelta.x * speed * Window::GetDeltaTime();
+			eulerAngles.x -= mMousePositionDelta.y * speed * Window::GetDeltaTime();
+			eulerAngles.y += mMousePositionDelta.x * speed * Window::GetDeltaTime();
 
 			if (eulerAngles.x < -89.9F) eulerAngles.x = -89.9F;
 			if (eulerAngles.x > 89.9F) eulerAngles.x = 89.9F;
 
-			mTransform->LocalEulerAngles = eulerAngles;
+			transform->LocalEulerAngles = eulerAngles;
 		}
 
-		mousePositionStart -= mousePositionDelta * mRotationDrag * Window::GetDeltaTime();
+		mMousePositionStart -= mMousePositionDelta * mRotationDrag * Window::GetDeltaTime();
 	}
 }

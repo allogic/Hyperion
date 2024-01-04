@@ -15,6 +15,7 @@
 
 #include <Engine/Platform/Window.h>
 
+#include <Engine/Renderer/Material.h>
 #include <Engine/Renderer/Renderer.h>
 
 #include <Engine/Vulkan/Image.h>
@@ -300,7 +301,13 @@ namespace hyperion
 	{
 		mPhysicallyBasedDescriptorSets.resize(DescriptorCount);
 
-		auto descriptorSetLayouts = std::vector<VkDescriptorSetLayout>{ DescriptorCount, mPhysicallyBasedDescriptorSetLayout };
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {};
+		descriptorSetLayouts.resize(DescriptorCount);
+
+		for (U32 i = 0; i < DescriptorCount; ++i)
+		{
+			descriptorSetLayouts[i] = mPhysicallyBasedDescriptorSetLayout;
+		}
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -315,7 +322,13 @@ namespace hyperion
 	{
 		mTextDescriptorSets.resize(DescriptorCount);
 
-		auto descriptorSetLayouts = std::vector<VkDescriptorSetLayout>{ DescriptorCount, mTextDescriptorSetLayout };
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {};
+		descriptorSetLayouts.resize(DescriptorCount);
+
+		for (U32 i = 0; i < DescriptorCount; ++i)
+		{
+			descriptorSetLayouts[i] = mTextDescriptorSetLayout;
+		}
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -330,7 +343,13 @@ namespace hyperion
 	{
 		mInterfaceDescriptorSets.resize(DescriptorCount);
 
-		auto descriptorSetLayouts = std::vector<VkDescriptorSetLayout>{ DescriptorCount, mInterfaceDescriptorSetLayout };
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {};
+		descriptorSetLayouts.resize(DescriptorCount);
+
+		for (U32 i = 0; i < DescriptorCount; ++i)
+		{
+			descriptorSetLayouts[i] = mInterfaceDescriptorSetLayout;
+		}
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -345,7 +364,13 @@ namespace hyperion
 	{
 		mDebugDescriptorSets.resize(DescriptorCount);
 
-		auto descriptorSetLayouts = std::vector<VkDescriptorSetLayout>{ DescriptorCount, mDebugDescriptorSetLayout };
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts = {};
+		descriptorSetLayouts.resize(DescriptorCount);
+
+		for (U32 i = 0; i < DescriptorCount; ++i)
+		{
+			descriptorSetLayouts[i] = mDebugDescriptorSetLayout;
+		}
 
 		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 		descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -356,8 +381,15 @@ namespace hyperion
 		VK_CHECK(vkAllocateDescriptorSets(gWindow->GetDevice(), &descriptorSetAllocateInfo, mDebugDescriptorSets.data()));
 	}
 
-	void Renderer::UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex)
+	void Renderer::UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Material* Material)
 	{
+		Image* baseColorImage = Material->GetBaseColorImage();
+		Image* normalCameraImage = Material->GetNormalCameraImage();
+		Image* emissionColorImage = Material->GetEmissionColorImage();
+		Image* metallnessImage = Material->GetMetallnessImage();
+		Image* diffuseRoughnessImage = Material->GetDiffuseRoughnessImage();
+		Image* ambientOcclusionImage = Material->GetAmbientOcclusionImage();
+
 		VkDescriptorBufferInfo timeInfoDescriptorBufferInfo = {};
 		timeInfoDescriptorBufferInfo.offset = 0;
 		timeInfoDescriptorBufferInfo.buffer = mTimeInfoBuffer->GetBuffer();
@@ -367,6 +399,36 @@ namespace hyperion
 		viewProjectionDescriptorBufferInfo.offset = 0;
 		viewProjectionDescriptorBufferInfo.buffer = mViewProjectionBuffer->GetBuffer();
 		viewProjectionDescriptorBufferInfo.range = mViewProjectionBuffer->GetSize();
+
+		VkDescriptorImageInfo baseColorDescriptorImageInfo = {};
+		baseColorDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		baseColorDescriptorImageInfo.imageView = baseColorImage->GetImageView();
+		baseColorDescriptorImageInfo.sampler = baseColorImage->GetSampler();
+
+		VkDescriptorImageInfo normalCameraDescriptorImageInfo = {};
+		normalCameraDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		normalCameraDescriptorImageInfo.imageView = normalCameraImage->GetImageView();
+		normalCameraDescriptorImageInfo.sampler = normalCameraImage->GetSampler();
+
+		VkDescriptorImageInfo emissionColorDescriptorImageInfo = {};
+		emissionColorDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		emissionColorDescriptorImageInfo.imageView = emissionColorImage->GetImageView();
+		emissionColorDescriptorImageInfo.sampler = emissionColorImage->GetSampler();
+
+		VkDescriptorImageInfo metallnessDescriptorImageInfo = {};
+		metallnessDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		metallnessDescriptorImageInfo.imageView = metallnessImage->GetImageView();
+		metallnessDescriptorImageInfo.sampler = metallnessImage->GetSampler();
+
+		VkDescriptorImageInfo diffuseRoughnessDescriptorImageInfo = {};
+		diffuseRoughnessDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		diffuseRoughnessDescriptorImageInfo.imageView = diffuseRoughnessImage->GetImageView();
+		diffuseRoughnessDescriptorImageInfo.sampler = diffuseRoughnessImage->GetSampler();
+
+		VkDescriptorImageInfo ambientOcclusionDescriptorImageInfo = {};
+		ambientOcclusionDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		ambientOcclusionDescriptorImageInfo.imageView = ambientOcclusionImage->GetImageView();
+		ambientOcclusionDescriptorImageInfo.sampler = ambientOcclusionImage->GetSampler();
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {};
 		writeDescriptorSets.resize(mPhysicallyBasedDescriptorSetLayoutBindings.size());
@@ -392,6 +454,72 @@ namespace hyperion
 		writeDescriptorSets[1].pImageInfo = 0;
 		writeDescriptorSets[1].pBufferInfo = &viewProjectionDescriptorBufferInfo;
 		writeDescriptorSets[1].pTexelBufferView = 0;
+
+		writeDescriptorSets[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[2].pNext = 0;
+		writeDescriptorSets[2].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[2].dstBinding = 2;
+		writeDescriptorSets[2].dstArrayElement = 0;
+		writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[2].descriptorCount = 1;
+		writeDescriptorSets[2].pImageInfo = &baseColorDescriptorImageInfo;
+		writeDescriptorSets[2].pBufferInfo = 0;
+		writeDescriptorSets[2].pTexelBufferView = 0;
+
+		writeDescriptorSets[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[3].pNext = 0;
+		writeDescriptorSets[3].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[3].dstBinding = 3;
+		writeDescriptorSets[3].dstArrayElement = 0;
+		writeDescriptorSets[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[3].descriptorCount = 1;
+		writeDescriptorSets[3].pImageInfo = &normalCameraDescriptorImageInfo;
+		writeDescriptorSets[3].pBufferInfo = 0;
+		writeDescriptorSets[3].pTexelBufferView = 0;
+		
+		writeDescriptorSets[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[4].pNext = 0;
+		writeDescriptorSets[4].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[4].dstBinding = 4;
+		writeDescriptorSets[4].dstArrayElement = 0;
+		writeDescriptorSets[4].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[4].descriptorCount = 1;
+		writeDescriptorSets[4].pImageInfo = &emissionColorDescriptorImageInfo;
+		writeDescriptorSets[4].pBufferInfo = 0;
+		writeDescriptorSets[4].pTexelBufferView = 0;
+
+		writeDescriptorSets[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[5].pNext = 0;
+		writeDescriptorSets[5].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[5].dstBinding = 5;
+		writeDescriptorSets[5].dstArrayElement = 0;
+		writeDescriptorSets[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[5].descriptorCount = 1;
+		writeDescriptorSets[5].pImageInfo = &metallnessDescriptorImageInfo;
+		writeDescriptorSets[5].pBufferInfo = 0;
+		writeDescriptorSets[5].pTexelBufferView = 0;
+		
+		writeDescriptorSets[6].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[6].pNext = 0;
+		writeDescriptorSets[6].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[6].dstBinding = 6;
+		writeDescriptorSets[6].dstArrayElement = 0;
+		writeDescriptorSets[6].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[6].descriptorCount = 1;
+		writeDescriptorSets[6].pImageInfo = &diffuseRoughnessDescriptorImageInfo;
+		writeDescriptorSets[6].pBufferInfo = 0;
+		writeDescriptorSets[6].pTexelBufferView = 0;
+
+		writeDescriptorSets[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[7].pNext = 0;
+		writeDescriptorSets[7].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[7].dstBinding = 7;
+		writeDescriptorSets[7].dstArrayElement = 0;
+		writeDescriptorSets[7].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[7].descriptorCount = 1;
+		writeDescriptorSets[7].pImageInfo = &ambientOcclusionDescriptorImageInfo;
+		writeDescriptorSets[7].pBufferInfo = 0;
+		writeDescriptorSets[7].pTexelBufferView = 0;
 
 		vkUpdateDescriptorSets(gWindow->GetDevice(), (U32)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, 0);
 	}
@@ -868,7 +996,7 @@ namespace hyperion
 			delete mFontAtlasImage;
 		}
 
-		mFontAtlasImage = ImageVariance::CreateRImage2D((void*)Atlas.data(), Width, Height);
+		mFontAtlasImage = ImageVariance::CreateImage2DR((void*)Atlas.data(), Width, Height);
 	}
 
 	void Renderer::SetFontInfo(std::string const& Font, FontInfo const& Info)

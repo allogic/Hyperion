@@ -5,7 +5,7 @@
 
 namespace hyperion
 {
-	Image* ImageVariance::CreateRImage2D(void* Data, U32 Width, U32 Height)
+	Image* ImageVariance::CreateImage2DR(void* Data, U32 Width, U32 Height, VkFormat Format)
 	{
 		Buffer stagingBuffer = { Width * Height * 1, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -13,7 +13,7 @@ namespace hyperion
 		stagingBuffer.SetMappedData(Data);
 		stagingBuffer.Unmap();
 
-		Image* targetImage = new Image{ Width, Height, 1, 1, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, VK_FORMAT_R8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
+		Image* targetImage = new Image{ Width, Height, 1, 1, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, Format, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
 
 		VkCommandBuffer commandBuffer = CommandBuffer::Begin();
 
@@ -26,7 +26,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgImage2D(void* Data, U32 Width, U32 Height)
+	Image* ImageVariance::CreateImage2DRG(void* Data, U32 Width, U32 Height, VkFormat Format)
 	{
 		Buffer stagingBuffer = { Width * Height * 2, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -34,7 +34,7 @@ namespace hyperion
 		stagingBuffer.SetMappedData(Data);
 		stagingBuffer.Unmap();
 
-		Image* targetImage = new Image{ Width, Height, 1, 2, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, VK_FORMAT_R8G8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
+		Image* targetImage = new Image{ Width, Height, 1, 2, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, Format, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
 
 		VkCommandBuffer commandBuffer = CommandBuffer::Begin();
 
@@ -47,7 +47,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgbImage2D(void* Data, U32 Width, U32 Height)
+	Image* ImageVariance::CreateImage2DRGB(void* Data, U32 Width, U32 Height, VkFormat Format)
 	{
 		Buffer stagingBuffer = { Width * Height * 3, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -55,7 +55,7 @@ namespace hyperion
 		stagingBuffer.SetMappedData(Data);
 		stagingBuffer.Unmap();
 
-		Image* targetImage = new Image{ Width, Height, 1, 3, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, VK_FORMAT_B8G8R8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
+		Image* targetImage = new Image{ Width, Height, 1, 3, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, Format, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
 
 		VkCommandBuffer commandBuffer = CommandBuffer::Begin();
 
@@ -68,7 +68,7 @@ namespace hyperion
 		return targetImage;
 	}
 
-	Image* ImageVariance::CreateRgbaImage2D(void* Data, U32 Width, U32 Height)
+	Image* ImageVariance::CreateImage2DRGBA(void* Data, U32 Width, U32 Height, VkFormat Format)
 	{
 		Buffer stagingBuffer = { Width * Height * 4, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT };
 
@@ -76,7 +76,7 @@ namespace hyperion
 		stagingBuffer.SetMappedData(Data);
 		stagingBuffer.Unmap();
 
-		Image* targetImage = new Image{ Width, Height, 1, 4, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
+		Image* targetImage = new Image{ Width, Height, 1, 4, VK_IMAGE_TYPE_2D, VK_IMAGE_VIEW_TYPE_2D, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_IMAGE_ASPECT_COLOR_BIT, Format, VK_IMAGE_TILING_OPTIMAL, VK_FILTER_NEAREST };
 
 		VkCommandBuffer commandBuffer = CommandBuffer::Begin();
 

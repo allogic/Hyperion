@@ -105,7 +105,7 @@ namespace hyperion
 		void BuildInterfaceDescriptorSets(U32 DescriptorCount);
 		void BuildDebugDescriptorSets(U32 DescriptorCount);
 
-		void UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex);
+		void UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Material* Material);
 		void UpdateTextDescriptorSets(U32 DescriptorIndex);
 		void UpdateInterfaceDescriptorSets(U32 DescriptorIndex);
 		void UpdateDebugDescriptorSets(U32 DescriptorIndex);
@@ -186,6 +186,13 @@ namespace hyperion
 		{
 			{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
 			{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
+
+			{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 		};
 
 		std::vector<VkPushConstantRange> mPhysicallyBasedPushConstantRanges =

@@ -201,7 +201,7 @@ namespace hyperion
 
 	void TransformHierarchy::Print()
 	{
-		LOG("Transform hierarchy:\n");
+		LOG("Transform hierarchy\n");
 
 		for (U32 i = 0; i < (U32)mLevels.size(); ++i)
 		{

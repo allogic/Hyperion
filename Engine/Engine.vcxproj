@@ -569,8 +569,9 @@
     <ClInclude Include="Glm\vec3.hpp" />
     <ClInclude Include="Glm\vec4.hpp" />
     <ClInclude Include="Glm\vector_relational.hpp" />
+    <ClInclude Include="Renderer\Material.h" />
     <ClInclude Include="TinyGltf\tiny_gltf.h" />
-    <ClInclude Include="ImageUtility.h" />
+    <ClInclude Include="Utility\ImageUtility.h" />
     <ClInclude Include="Interface\FontAtlas.h" />
     <ClInclude Include="Interface\Interface.h" />
     <ClInclude Include="Interface\LayoutParser.h" />
@@ -645,7 +646,7 @@
     <ClCompile Include="Ecs\Components\Camera.cpp" />
     <ClCompile Include="Ecs\Components\Renderable.cpp" />
     <ClCompile Include="Ecs\Entity.cpp" />
-    <ClCompile Include="ImageUtility.cpp" />
+    <ClCompile Include="Utility\ImageUtility.cpp" />
     <ClCompile Include="Interface\FontAtlas.cpp" />
     <ClCompile Include="Interface\Interface.cpp" />
     <ClCompile Include="Interface\LayoutParser.cpp" />
@@ -656,6 +657,7 @@
     <ClCompile Include="Interface\Nodes\StackPanel.cpp" />
     <ClCompile Include="Interface\Nodes\Text.cpp" />
     <ClCompile Include="Math\Math.cpp" />
+    <ClCompile Include="Renderer\Material.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Ecs\TransformHierarchy.cpp" />
     <ClCompile Include="Vulkan\Buffer.cpp" />

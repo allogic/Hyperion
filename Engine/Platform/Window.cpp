@@ -33,6 +33,7 @@ namespace hyperion
 	static std::vector<char const*> sDeviceExtensions =
 	{
 		"VK_KHR_swapchain",
+		"VK_EXT_descriptor_indexing",
 	};
 
 #ifdef _DEBUG
@@ -619,14 +620,23 @@ namespace hyperion
 		queueCreateInfos[1].queueCount = 1;
 		queueCreateInfos[1].pQueuePriorities = &queuePriority;
 
-		VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
-		physicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
+		VkPhysicalDeviceDescriptorIndexingFeatures physicalDeviceDescriptorIndexingFeatures = {};
+		physicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+		physicalDeviceDescriptorIndexingFeatures.pNext = 0;
+
+		VkPhysicalDeviceFeatures2 physicalDeviceExtendedFeatures = {};
+		physicalDeviceExtendedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		physicalDeviceExtendedFeatures.pNext = &physicalDeviceDescriptorIndexingFeatures;
+
+		vkGetPhysicalDeviceFeatures2(mPhysicalDevice, &physicalDeviceExtendedFeatures);
+
+		physicalDeviceExtendedFeatures.features.samplerAnisotropy = VK_TRUE;
 
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 		deviceCreateInfo.queueCreateInfoCount = (U32)queueCreateInfos.size();
-		deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
+		deviceCreateInfo.pNext = &physicalDeviceExtendedFeatures;
 		deviceCreateInfo.ppEnabledExtensionNames = sDeviceExtensions.data();
 		deviceCreateInfo.enabledExtensionCount = (U32)sDeviceExtensions.size();
 #ifdef _DEBUG

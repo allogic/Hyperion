@@ -9,7 +9,6 @@ namespace hyperion
 
 	class Camera;
 	class Renderable;
-	struct Transform;
 
 	class Node;
 
@@ -21,10 +20,15 @@ namespace hyperion
 
 	class Buffer;
 	class Image;
+	
+	class Material;
 	class Renderer;
+
 	class Window;
 
 	class Scene;
+
+	struct Transform;
 
 	class Component;
 	class Entity;

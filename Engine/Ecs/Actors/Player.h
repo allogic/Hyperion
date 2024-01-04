@@ -23,15 +23,19 @@ namespace hyperion
 	private:
 
 		Camera* mCamera = 0;
-		Transform* mTransform = 0;
 
 	private:
+
+		R32V3 mVelocity = {};
+
+		R32V2 mMousePositionStart = {};
+		R32V2 mMousePositionDelta = {};
 
 		R32 mKeyboardMoveSpeedFast = 100.0F;
 		R32 mKeyboardMoveSpeedNormal = 0.1F;
 
 		R32 mMouseMoveSpeedFast = 5.0F;
-		R32 mMouseMoveSpeedNormal = 0.1F;
+		R32 mMouseMoveSpeedNormal = 0.025F;
 
 		R32 mMouseRotationSpeedFast = 5.0F;
 		R32 mMouseRotationSpeedNormal = 2.0F;

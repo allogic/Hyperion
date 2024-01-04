@@ -52,7 +52,7 @@ I32 main()
 				Transform* transform = scene->GetTransform(test);
 				transform->LocalPosition = R32V3{ i * 10.0F - (n * 10.0F / 2.0F) + 5.0F, 0.0F, j * 10.0F - (n * 10.0F / 2.0F) + 5.0F };
 				transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
-				transform->LocalScale = R32V3{ 0.0F, 0.0F, 0.0F };
+				transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
 
 				for (U32 k = 0; k < 32; ++k)
 				{
@@ -61,7 +61,7 @@ I32 main()
 					Transform* transform = scene->GetTransform(test);
 					transform->LocalPosition = R32V3{ 0.0F, 2.0F, 0.0F };
 					transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
-					transform->LocalScale = R32V3{ 0.0F, 0.0F, 0.0F };
+					transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
 					transform->WorldSpace = 0;
 				}
 			}

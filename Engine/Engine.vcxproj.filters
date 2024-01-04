@@ -42,7 +42,7 @@
     <ClInclude Include="Ecs\TransformHierarchy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImageUtility.h">
+    <ClInclude Include="Utility\ImageUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Math\Math.h">
@@ -1512,6 +1512,9 @@
     <ClInclude Include="Assimp\ZipArchiveIOSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -1535,7 +1538,7 @@
     <ClCompile Include="Ecs\TransformHierarchy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImageUtility.cpp">
+    <ClCompile Include="Utility\ImageUtility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Math\Math.cpp">
@@ -1605,6 +1608,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Interface\FontAtlas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

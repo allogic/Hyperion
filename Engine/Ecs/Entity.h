@@ -51,8 +51,8 @@ namespace hyperion
 
 	public:
 
-		template<typename Predicate>
-		static void TraverseRecursive(Entity* Entity, Predicate&& Pred);
+		template<typename Function>
+		static void TraverseRecursive(Entity* Entity, Function const& Func);
 
 	public:
 
@@ -90,14 +90,14 @@ namespace hyperion
 		return (C*)mComponents[typeid(C).hash_code()];
 	}
 
-	template<typename Predicate>
-	void Entity::TraverseRecursive(Entity* Entity, Predicate&& Pred)
+	template<typename Function>
+	void Entity::TraverseRecursive(Entity* Entity, Function const& Func)
 	{
-		Pred(Entity);
+		Func(Entity);
 
 		for (auto const& child : mChildren)
 		{
-			TraverseRecursive(child, Pred);
+			TraverseRecursive(child, Func);
 		}
 	}
 }
