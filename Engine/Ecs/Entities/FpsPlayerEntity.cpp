@@ -4,25 +4,25 @@
 
 #include <Engine/Ecs/Transform.h>
 
-#include <Engine/Ecs/Actors/Player.h>
+#include <Engine/Ecs/Entities/FpsPlayerEntity.h>
 
-#include <Engine/Ecs/Components/Camera.h>
+#include <Engine/Ecs/Components/CameraComponent.h>
 
 #include <Engine/Platform/Window.h>
 
 namespace hyperion
 {
-	Player::Player(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
+	FpsPlayerEntity::FpsPlayerEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
 	{
-		mCamera = GetScene()->GetCamera(this);
+		mCameraComponent = GetScene()->GetCameraComponent(this);
 	}
 
-	Player::~Player()
+	FpsPlayerEntity::~FpsPlayerEntity()
 	{
 
 	}
 
-	void Player::Update()
+	void FpsPlayerEntity::Update()
 	{
 		HandlePosition();
 		HandleRotation();
@@ -30,25 +30,25 @@ namespace hyperion
 		Entity::Update();
 	}
 
-	void Player::HandlePosition()
+	void FpsPlayerEntity::HandlePosition()
 	{
 		Transform* transform = GetScene()->GetTransform(this);
 
 		R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mKeyboardMoveSpeedFast : mKeyboardMoveSpeedNormal;
 
-		if (Window::KeyHeld(KeyCode::KeyD)) mVelocity += transform->LocalRight * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyA)) mVelocity -= transform->LocalRight * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyE)) mVelocity += WorldUp * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyQ)) mVelocity -= WorldUp * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyW)) mVelocity += transform->LocalFront * speed * Window::GetDeltaTime();
-		if (Window::KeyHeld(KeyCode::KeyS)) mVelocity -= transform->LocalFront * speed * Window::GetDeltaTime();
+		if (Window::KeyHeld(KeyCode::KeyD)) mVelocity += transform->LocalRight * speed;
+		if (Window::KeyHeld(KeyCode::KeyA)) mVelocity -= transform->LocalRight * speed;
+		if (Window::KeyHeld(KeyCode::KeyE)) mVelocity += WorldUp * speed;
+		if (Window::KeyHeld(KeyCode::KeyQ)) mVelocity -= WorldUp * speed;
+		if (Window::KeyHeld(KeyCode::KeyW)) mVelocity += transform->LocalFront * speed;
+		if (Window::KeyHeld(KeyCode::KeyS)) mVelocity -= transform->LocalFront * speed;
 
 		mVelocity += -mVelocity * mMoveDrag * Window::GetDeltaTime();
 
-		transform->LocalPosition += transform->LocalRotation * mVelocity;
+		transform->LocalPosition += transform->LocalRotation * mVelocity * Window::GetDeltaTime();
 	}
 
-	void Player::HandleRotation()
+	void FpsPlayerEntity::HandleRotation()
 	{
 		Transform* transform = GetScene()->GetTransform(this);
 
@@ -65,10 +65,10 @@ namespace hyperion
 
 			R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mMouseMoveSpeedFast : mMouseMoveSpeedNormal;
 
-			positionOffset += WorldUp * mMousePositionDelta.y * speed * Window::GetDeltaTime();
-			positionOffset += transform->LocalRight * mMousePositionDelta.x * speed * Window::GetDeltaTime();
+			positionOffset += WorldUp * mMousePositionDelta.y * speed;
+			positionOffset += transform->LocalRight * mMousePositionDelta.x * speed;
 
-			transform->LocalPosition += transform->LocalRotation * positionOffset;
+			transform->LocalPosition += transform->LocalRotation * positionOffset * Window::GetDeltaTime();
 		}
 		else if (Window::RightMouseHeld())
 		{

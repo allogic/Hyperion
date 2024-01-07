@@ -4,12 +4,12 @@
 
 namespace hyperion
 {
-	class Player : public Entity
+	class FpsPlayerEntity : public Entity
 	{
 	public:
 
-		Player(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId);
-		virtual ~Player();
+		FpsPlayerEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId);
+		virtual ~FpsPlayerEntity();
 
 	public:
 
@@ -22,7 +22,7 @@ namespace hyperion
 
 	private:
 
-		Camera* mCamera = 0;
+		CameraComponent* mCameraComponent = 0;
 
 	private:
 

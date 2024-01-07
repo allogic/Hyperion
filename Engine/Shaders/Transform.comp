@@ -30,11 +30,11 @@ layout(binding = 0) uniform TimeInfo
 	float deltaTime;
 } timeInfo;
 
-layout(binding = 1) uniform ViewProjection
+layout(binding = 1) uniform ProjectionInfo
 {
 	mat4 view;
 	mat4 projection;
-} viewProjection;
+} projectionInfo;
 
 layout(binding = 2) buffer TransformBuffer
 {

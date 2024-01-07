@@ -5,12 +5,15 @@
 
 #include <Engine/Ecs/Entity.h>
 
-#include <Engine/Ecs/Actors/Test.h>
+#include <Engine/Ecs/Components/AnimatorComponent.h>
+
+#include <Engine/Ecs/Entities/TestEntity.h>
 
 #include <Engine/Interface/Interface.h>
 
 #include <Engine/Platform/Window.h>
 
+#include <Engine/Renderer/Model.h>
 #include <Engine/Renderer/Renderer.h>
 
 #include <Editor/Interface/MyButton.h>
@@ -33,13 +36,26 @@ I32 main()
 
 	Interface::ParseLayout(ROOT_PATH "Projects\\Editor\\Interface\\ActionBar.xml");
 
+	Model* model = Model::Load(ROOT_PATH "Projects\\Editor\\Models\\Chaman\\Chaman.glb");
+
+	auto animations = model->GetAnimations(); // TODO: Refactor this!
+
+	model->PrintStats();
+	model->PrintSkeletonHierarchy();
+
 	Scene* scene = new Scene;
 
-	scene->Load(ROOT_PATH "Projects\\Editor\\Models\\Shibahu2\\untitled.glb");
+	Entity* modelEntity = scene->CreateEntityFromModel(model);
+
+	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Take 001"]);
+	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
+	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
+
 	scene->Commit();
 
-	Entity* root = scene->GetRoot();
+	Entity* rootEntity = scene->GetRootEntity();
 
+	/*
 	{
 		U32 n = 1;
 
@@ -47,18 +63,18 @@ I32 main()
 		{
 			for (U32 j = 0; j < n; ++j)
 			{
-				Test* test = scene->CreateEntity<Test>("Test");
+				TestEntity* testEntity = scene->CreateEntity<TestEntity>("Test");
 
-				Transform* transform = scene->GetTransform(test);
+				Transform* transform = scene->GetTransform(testEntity);
 				transform->LocalPosition = R32V3{ i * 10.0F - (n * 10.0F / 2.0F) + 5.0F, 0.0F, j * 10.0F - (n * 10.0F / 2.0F) + 5.0F };
 				transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
 				transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
 
 				for (U32 k = 0; k < 32; ++k)
 				{
-					test = scene->CreateEntity<Test>("Test", test);
+					testEntity = scene->CreateEntity<TestEntity>("Test", testEntity);
 
-					Transform* transform = scene->GetTransform(test);
+					Transform* transform = scene->GetTransform(testEntity);
 					transform->LocalPosition = R32V3{ 0.0F, 2.0F, 0.0F };
 					transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
 					transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
@@ -67,8 +83,9 @@ I32 main()
 			}
 		}
 	}
+	*/
 
-	root->PrintHierarchy();
+	rootEntity->PrintHierarchy();
 	scene->PrintHierarchy();
 
 	while (!Window::ShouldClose())
@@ -80,11 +97,13 @@ I32 main()
 		Renderer::DrawText(R32V3{ 100.0F, 250.0F, 0.5F }, "ProggyClean", "- Intermediate XML Interface", 2.0F, 0xFFFFFFFF);
 		Renderer::DrawText(R32V3{ 100.0F, 200.0F, 0.5F }, "ProggyClean", "- Smart Font Texture Atlas", 2.0F, 0xFFFFFFFF);
 
+		//Renderer::DrawDebugSkeleton(model->GetSkeleton());
+
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 1.0F, 0.0F, 0.0F }, 0xFF0000FF);
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 0.0F, 1.0F, 0.0F }, 0x00FF00FF);
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 0.0F, 0.0F, 1.0F }, 0x0000FFFF);
 
-		Renderer::DrawDebugRectXZ(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 25.0F, 0.0F, 25.0F }, 0xFFFFFFFF);
+		Renderer::DrawDebugGridXZ(R32V3{ 0.0F, 0.0F, 0.0F }, 10, 10, 1.0F, 0xFFFFFF44);
 
 		Interface::Update();
 		Interface::Render();
@@ -97,6 +116,7 @@ I32 main()
 	}
 	
 	delete scene;
+	delete model;
 
 	Window::Destroy();
 

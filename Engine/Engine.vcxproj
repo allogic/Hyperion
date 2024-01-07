@@ -135,6 +135,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\Animation.h" />
+    <ClInclude Include="Animation\Bone.h" />
+    <ClInclude Include="Animation\Skeleton.h" />
     <ClInclude Include="Assimp\aabb.h" />
     <ClInclude Include="Assimp\ai_assert.h" />
     <ClInclude Include="Assimp\anim.h" />
@@ -218,8 +221,9 @@
     <ClInclude Include="Assimp\XmlParser.h" />
     <ClInclude Include="Assimp\XMLTools.h" />
     <ClInclude Include="Assimp\ZipArchiveIOSystem.h" />
-    <ClInclude Include="Ecs\Actors\Player.h" />
-    <ClInclude Include="Ecs\Actors\Test.h" />
+    <ClInclude Include="Ecs\Components\AnimatorComponent.h" />
+    <ClInclude Include="Ecs\Entities\FpsPlayerEntity.h" />
+    <ClInclude Include="Ecs\Entities\TestEntity.h" />
     <ClInclude Include="Common\Config.h" />
     <ClInclude Include="Common\FileSystem.h" />
     <ClInclude Include="Common\Macros.h" />
@@ -228,8 +232,9 @@
     <ClInclude Include="Common\Types.h" />
     <ClInclude Include="Common\ValueDatabase.h" />
     <ClInclude Include="Ecs\Component.h" />
-    <ClInclude Include="Ecs\Components\Camera.h" />
-    <ClInclude Include="Ecs\Components\Renderable.h" />
+    <ClInclude Include="Ecs\Components\CameraComponent.h" />
+    <ClInclude Include="Ecs\Components\ComputeComponent.h" />
+    <ClInclude Include="Ecs\Components\RenderComponent.h" />
     <ClInclude Include="Forward.h" />
     <ClInclude Include="Ecs\Entity.h" />
     <ClInclude Include="FreeType\freetype\config\ftconfig.h" />
@@ -570,7 +575,10 @@
     <ClInclude Include="Glm\vec4.hpp" />
     <ClInclude Include="Glm\vector_relational.hpp" />
     <ClInclude Include="Renderer\Material.h" />
+    <ClInclude Include="Renderer\Model.h" />
+    <ClInclude Include="Renderer\Mesh.h" />
     <ClInclude Include="TinyGltf\tiny_gltf.h" />
+    <ClInclude Include="Utility\AssimpUtility.h" />
     <ClInclude Include="Utility\ImageUtility.h" />
     <ClInclude Include="Interface\FontAtlas.h" />
     <ClInclude Include="Interface\Interface.h" />
@@ -637,15 +645,23 @@
     <ClInclude Include="Xml\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ecs\Actors\Player.cpp" />
-    <ClCompile Include="Ecs\Actors\Test.cpp" />
+    <ClCompile Include="Animation\Animation.cpp" />
+    <ClCompile Include="Animation\Bone.cpp" />
+    <ClCompile Include="Animation\Skeleton.cpp" />
+    <ClCompile Include="Ecs\Components\AnimatorComponent.cpp" />
+    <ClCompile Include="Ecs\Entities\FpsPlayerEntity.cpp" />
+    <ClCompile Include="Ecs\Entities\TestEntity.cpp" />
     <ClCompile Include="Common\FileSystem.cpp" />
     <ClCompile Include="Common\Timer.cpp" />
     <ClCompile Include="Common\ValueDatabase.cpp" />
     <ClCompile Include="Ecs\Component.cpp" />
-    <ClCompile Include="Ecs\Components\Camera.cpp" />
-    <ClCompile Include="Ecs\Components\Renderable.cpp" />
+    <ClCompile Include="Ecs\Components\CameraComponent.cpp" />
+    <ClCompile Include="Ecs\Components\ComputeComponent.cpp" />
+    <ClCompile Include="Ecs\Components\RenderComponent.cpp" />
     <ClCompile Include="Ecs\Entity.cpp" />
+    <ClCompile Include="Renderer\Model.cpp" />
+    <ClCompile Include="Renderer\Mesh.cpp" />
+    <ClCompile Include="Utility\AssimpUtility.cpp" />
     <ClCompile Include="Utility\ImageUtility.cpp" />
     <ClCompile Include="Interface\FontAtlas.cpp" />
     <ClCompile Include="Interface\Interface.cpp" />
@@ -815,6 +831,15 @@
     <None Include="Glm\gtx\vector_angle.inl" />
     <None Include="Glm\gtx\vector_query.inl" />
     <None Include="Glm\gtx\wrap.inl" />
+    <None Include="Shaders\Debug.frag" />
+    <None Include="Shaders\Debug.vert" />
+    <None Include="Shaders\Interface.frag" />
+    <None Include="Shaders\Interface.vert" />
+    <None Include="Shaders\PhysicallyBased.frag" />
+    <None Include="Shaders\PhysicallyBased.vert" />
+    <None Include="Shaders\Text.frag" />
+    <None Include="Shaders\Text.vert" />
+    <None Include="Shaders\Transform.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

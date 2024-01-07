@@ -28,10 +28,15 @@ namespace hyperion
 		R32V2 Size;
 	};
 
-	struct ViewProjection
+	struct ProjectionInfo
 	{
 		R32M4 View;
 		R32M4 Projection;
+	};
+
+	struct BoneInfo
+	{
+		R32M4 Bones[100];
 	};
 #pragma pack (pop)
 
@@ -57,7 +62,7 @@ namespace hyperion
 	public:
 
 		inline auto GetTimeInfoBuffer() const { return mTimeInfoBuffer; }
-		inline auto GetViewProjectionBuffer() const { return mViewProjectionBuffer; }
+		inline auto GetProjectionInfoBuffer() const { return mProjectionInfoBuffer; }
 		inline auto GetComputeCommandBuffer() const { return mComputeCommandBuffer; }
 
 	public:
@@ -105,7 +110,7 @@ namespace hyperion
 		void BuildInterfaceDescriptorSets(U32 DescriptorCount);
 		void BuildDebugDescriptorSets(U32 DescriptorCount);
 
-		void UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Material* Material);
+		void UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Entity* Entity);
 		void UpdateTextDescriptorSets(U32 DescriptorIndex);
 		void UpdateInterfaceDescriptorSets(U32 DescriptorIndex);
 		void UpdateDebugDescriptorSets(U32 DescriptorIndex);
@@ -145,16 +150,17 @@ namespace hyperion
 		static void DrawDebugRectXZ(R32V3 const& Position, R32V3 const& Size, U32 Color, R32Q const& Rotation = { 0.0F, 0.0F, 0.0F, 1.0F });
 		static void DrawDebugGridXZ(R32V3 const& Position, U32 DivisionX, U32 DivisionZ, R32 Size, U32 Color, R32Q const& Rotation = { 0.0F, 0.0F, 0.0F, 1.0F });
 		static void DrawDebugBox(R32V3 const& Position, R32V3 const& Size, U32 Color, R32Q const& Rotation = { 0.0F, 0.0F, 0.0F, 1.0F });
+		static void DrawDebugSkeleton(Skeleton* Skeleton);
 
 	private:
 
 		TimeInfo mTimeInfo = {};
 		ScreenInfo mScreenInfo = {};
-		ViewProjection mViewProjection = {};
+		ProjectionInfo mProjectionInfo = {};
 
 		Buffer* mTimeInfoBuffer = 0;
 		Buffer* mScreenInfoBuffer = 0;
-		Buffer* mViewProjectionBuffer = 0;
+		Buffer* mProjectionInfoBuffer = 0;
 
 	private:
 
@@ -186,13 +192,14 @@ namespace hyperion
 		{
 			{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
 			{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
+			{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
 
-			{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
+			{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 		};
 
 		std::vector<VkPushConstantRange> mPhysicallyBasedPushConstantRanges =
@@ -229,6 +236,9 @@ namespace hyperion
 			{ 17, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel5) },
 			{ 18, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel6) },
 			{ 19, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel7) },
+
+			{ 20, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SINT, offsetof(PhysicallyBasedVertex, BoneIds) },
+			{ 21, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, BoneWeights) },
 		};
 
 		VkDescriptorPool mPhysicallyBasedDescriptorPool = 0;

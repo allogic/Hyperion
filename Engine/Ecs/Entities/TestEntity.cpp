@@ -2,9 +2,9 @@
 
 #include <Engine/Ecs/Transform.h>
 
-#include <Engine/Ecs/Actors/Test.h>
+#include <Engine/Ecs/Entities/TestEntity.h>
 
-#include <Engine/Ecs/Components/Camera.h>
+#include <Engine/Ecs/Components/CameraComponent.h>
 
 #include <Engine/Platform/Window.h>
 
@@ -12,18 +12,17 @@
 
 namespace hyperion
 {
-	Test::Test(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
+	TestEntity::TestEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
 	{
-		mCamera = GetScene()->GetCamera(this);
 		mTransform = GetScene()->GetTransform(this);
 	}
 
-	Test::~Test()
+	TestEntity::~TestEntity()
 	{
 		
 	}
 
-	void Test::Update()
+	void TestEntity::Update()
 	{
 		mAngle += 6.0F * Window::GetDeltaTime();
 

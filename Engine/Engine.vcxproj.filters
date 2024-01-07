@@ -27,16 +27,16 @@
     <ClInclude Include="Ecs\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ecs\Components\Camera.h">
+    <ClInclude Include="Ecs\Components\CameraComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ecs\Actors\Player.h">
+    <ClInclude Include="Ecs\Entities\FpsPlayerEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ecs\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ecs\Actors\Test.h">
+    <ClInclude Include="Ecs\Entities\TestEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ecs\TransformHierarchy.h">
@@ -48,7 +48,7 @@
     <ClInclude Include="Math\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ecs\Components\Renderable.h">
+    <ClInclude Include="Ecs\Components\RenderComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StbImage\stb_image.h">
@@ -1515,6 +1515,30 @@
     <ClInclude Include="Renderer\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Ecs\Components\ComputeComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\AssimpUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Skeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Bone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\Components\AnimatorComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -1526,13 +1550,13 @@
     <ClCompile Include="Ecs\Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ecs\Components\Camera.cpp">
+    <ClCompile Include="Ecs\Components\CameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ecs\Actors\Player.cpp">
+    <ClCompile Include="Ecs\Entities\FpsPlayerEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ecs\Actors\Test.cpp">
+    <ClCompile Include="Ecs\Entities\TestEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Ecs\TransformHierarchy.cpp">
@@ -1544,7 +1568,7 @@
     <ClCompile Include="Math\Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ecs\Components\Renderable.cpp">
+    <ClCompile Include="Ecs\Components\RenderComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vulkan\Buffer.cpp">
@@ -1611,6 +1635,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ecs\Components\ComputeComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\AssimpUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Skeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Bone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ecs\Components\AnimatorComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2047,5 +2095,14 @@
     <None Include="Assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Shaders\Debug.frag" />
+    <None Include="Shaders\Debug.vert" />
+    <None Include="Shaders\Interface.frag" />
+    <None Include="Shaders\Interface.vert" />
+    <None Include="Shaders\PhysicallyBased.frag" />
+    <None Include="Shaders\PhysicallyBased.vert" />
+    <None Include="Shaders\Text.frag" />
+    <None Include="Shaders\Text.vert" />
+    <None Include="Shaders\Transform.comp" />
   </ItemGroup>
 </Project>

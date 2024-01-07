@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Engine/Forward.h>
+
 #include <Engine/Common/Types.h>
 
 namespace hyperion

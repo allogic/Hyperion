@@ -13,7 +13,7 @@ namespace hyperion
 		};
 	}
 
-	class Camera : public Component
+	class CameraComponent : public Component
 	{
 	public:
 
@@ -39,8 +39,8 @@ namespace hyperion
 
 	public:
 
-		Camera();
-		virtual ~Camera();
+		CameraComponent();
+		virtual ~CameraComponent();
 
 	private:
 
@@ -49,8 +49,8 @@ namespace hyperion
 	private:
 
 		R32 mFov = glm::radians(45.0F);
-		R32 mNear = 0.0001F;
-		R32 mFar = 10000.0F;
+		R32 mNear = 0.01F;
+		R32 mFar = 1000.0F;
 
 	private:
 

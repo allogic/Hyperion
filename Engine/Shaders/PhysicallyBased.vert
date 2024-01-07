@@ -1,5 +1,8 @@
 #version 450 core
 
+#define MAX_BONES 100
+#define MAX_BONE_INFLUENCE 4
+
 struct Transform
 {
 	vec3 localPosition;
@@ -44,6 +47,8 @@ layout(location = 16) in vec3 vertexTexCoordChannel4;
 layout(location = 17) in vec3 vertexTexCoordChannel5;
 layout(location = 18) in vec3 vertexTexCoordChannel6;
 layout(location = 19) in vec3 vertexTexCoordChannel7;
+layout(location = 20) in ivec4 vertexBoneIds;
+layout(location = 21) in vec4 vertexBoneWeights;
 
 layout(binding = 0) uniform TimeInfo
 {
@@ -51,11 +56,16 @@ layout(binding = 0) uniform TimeInfo
 	float deltaTime;
 } timeInfo;
 
-layout(binding = 1) uniform ViewProjection
+layout(binding = 1) uniform ProjectionInfo
 {
 	mat4 view;
 	mat4 projection;
-} viewProjection;
+} projectionInfo;
+
+layout(binding = 2) uniform BoneInfo
+{
+	mat4 boneTransforms[MAX_BONES];
+} boneInfo;
 
 layout(location = 0) out vec3 outputPosition;
 layout(location = 1) out vec3 outputNormal;
@@ -80,9 +90,32 @@ layout(location = 19) out vec3 outputTexCoordChannel7;
 
 void main()
 {
-	vec4 position = viewProjection.projection * viewProjection.view * vec4(vertexPosition.xyz, 1.0);
+	vec4 worldPosition = vec4(vertexPosition, 1.0);
 
-	outputPosition = vec3(position);
+	for (uint i = 0; i < MAX_BONE_INFLUENCE; ++i)
+	{
+		if (vertexBoneIds[i] == -1)
+		{
+			continue;
+		}
+
+		if (vertexBoneIds[i] >= MAX_BONES)
+		{
+			worldPosition = vec4(vertexPosition, 1.0);
+
+			break;
+		}
+
+		vec4 localPosition = boneInfo.boneTransforms[vertexBoneIds[i]] * vec4(vertexPosition, 1.0);
+
+		worldPosition += localPosition * vertexBoneWeights[i];
+
+		//vec3 localNormal = mat3(boneInfo.boneTransforms[vertexBoneIds[i]]) * vertexNormal; // TODO
+	}
+
+	worldPosition = projectionInfo.projection * projectionInfo.view * worldPosition;
+
+	outputPosition = vec3(worldPosition);
 	outputNormal = vertexNormal;
 	outputTangent = vertexTangent;
 	outputBiTangent = vertexBiTangent;
@@ -103,5 +136,5 @@ void main()
 	outputTexCoordChannel6 = vertexTexCoordChannel6;
 	outputTexCoordChannel7 = vertexTexCoordChannel7;
 
-	gl_Position = position;
+	gl_Position = worldPosition;
 }

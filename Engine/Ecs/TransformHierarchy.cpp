@@ -74,10 +74,10 @@ namespace hyperion
 		timeInfoDescriptorBufferInfo.buffer = gRenderer->GetTimeInfoBuffer()->GetBuffer();
 		timeInfoDescriptorBufferInfo.range = gRenderer->GetTimeInfoBuffer()->GetSize();
 
-		VkDescriptorBufferInfo viewProjectionDescriptorBufferInfo = {};
-		viewProjectionDescriptorBufferInfo.offset = 0;
-		viewProjectionDescriptorBufferInfo.buffer = gRenderer->GetViewProjectionBuffer()->GetBuffer();
-		viewProjectionDescriptorBufferInfo.range = gRenderer->GetViewProjectionBuffer()->GetSize();
+		VkDescriptorBufferInfo projectionInfoDescriptorBufferInfo = {};
+		projectionInfoDescriptorBufferInfo.offset = 0;
+		projectionInfoDescriptorBufferInfo.buffer = gRenderer->GetProjectionInfoBuffer()->GetBuffer();
+		projectionInfoDescriptorBufferInfo.range = gRenderer->GetProjectionInfoBuffer()->GetSize();
 
 		VkDescriptorBufferInfo transformDescriptorBufferInfo = {};
 		transformDescriptorBufferInfo.offset = 0;
@@ -111,7 +111,7 @@ namespace hyperion
 		writeDescriptorSets[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		writeDescriptorSets[1].descriptorCount = 1;
 		writeDescriptorSets[1].pImageInfo = 0;
-		writeDescriptorSets[1].pBufferInfo = &viewProjectionDescriptorBufferInfo;
+		writeDescriptorSets[1].pBufferInfo = &projectionInfoDescriptorBufferInfo;
 		writeDescriptorSets[1].pTexelBufferView = 0;
 
 		writeDescriptorSets[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

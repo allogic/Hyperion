@@ -15,11 +15,11 @@ layout(binding = 1) uniform ScreenInfo
 	vec2 size;
 } screenInfo;
 
-layout(binding = 2) uniform ViewProjection
+layout(binding = 2) uniform ProjectionInfo
 {
 	mat4 view;
 	mat4 projection;
-} viewProjection;
+} projectionInfo;
 
 layout(location = 0) out vec3 outputPosition;
 layout(location = 1) flat out uint outputColorChannel0;

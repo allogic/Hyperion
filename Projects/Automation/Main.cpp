@@ -28,9 +28,9 @@ I32 main()
 
 	Game* scene = new Game{ 5, 5 };
 
-	Entity* root = scene->GetRoot();
+	Entity* rootEntity = scene->GetRootEntity();
 
-	root->PrintHierarchy();
+	rootEntity->PrintHierarchy();
 	scene->PrintHierarchy();
 
 	while (!Window::ShouldClose())

@@ -4,6 +4,9 @@
 #include <Engine/Ecs/Component.h>
 #include <Engine/Ecs/Transform.h>
 
+#include <Engine/Renderer/Renderer.h> // TODO
+#include <Engine/Scene.h> // TODO
+
 namespace hyperion
 {
 	Entity::Entity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId)
@@ -47,6 +50,14 @@ namespace hyperion
 
 	void Entity::Update()
 	{
+		if (mParent)
+		{
+			Transform* parentTransform = mScene->GetTransform(mParent);
+			Transform* transform = mScene->GetTransform(this);
+
+			Renderer::DrawDebugLine(parentTransform->WorldPosition, transform->WorldPosition, 0xFFFF00FF);
+		}
+
 		for (auto const& child : mChildren)
 		{
 			child->Update();

@@ -4,8 +4,6 @@
 #include <filesystem>
 #include <vector>
 #include <map>
-#include <cassert>
-#include <future>
 
 #include <Engine/Forward.h>
 
@@ -15,26 +13,8 @@
 #include <Engine/Ecs/Transform.h>
 #include <Engine/Ecs/TransformHierarchy.h>
 
-#include <Engine/Renderer/Vertex.h>
-
-#include <Engine/Vulkan/Buffer.h>
-
-struct aiScene;
-struct aiNode;
-struct aiMaterial;
-
-enum aiTextureType;
-
 namespace hyperion
 {
-	struct AsyncMaterialImageResource
-	{
-		U32 Width;
-		U32 Height;
-		U32 Channels;
-		U8* Data;
-	};
-
 	constexpr R32V3 WorldRight = { 1.0F, 0.0F, 0.0F };
 	constexpr R32V3 WorldLeft = { -1.0F, 0.0F, 0.0F };
 	constexpr R32V3 WorldUp = { 0.0F, 1.0F, 0.0F };
@@ -46,11 +26,11 @@ namespace hyperion
 	{
 	public:
 
-		inline auto GetRoot() const { return mRoot; }
+		inline auto GetRootEntity() const { return mRootEntity; }
 		inline auto const& GetEntities() const { return mEntities; }
 		inline auto const& GetEntitiesToBeRendered() const { return mEntitiesToBeRendered; }
 		inline auto const& GetEntitiesToBeComputed() const { return mEntitiesToBeComputed; }
-		inline auto GetPlayer() const { return mPlayer; }
+		inline auto GetPlayer() const { return mPlayerEntity; }
 
 	public:
 
@@ -62,25 +42,20 @@ namespace hyperion
 		bool Load(std::filesystem::path const& File);
 		bool Safe(std::filesystem::path const& File);
 
-	private:
-
-		void LoadMaterials(aiScene const* Scene);
-		void LoadNodesRecursive(aiScene const* Scene, aiNode const* Node, Entity* Parent = 0);
-
-		AsyncMaterialImageResource LoadImageOfType(aiScene const* Scene, aiMaterial const* Material, aiTextureType Type);
-		Image* ExchangeResourceForImageAndRelease(AsyncMaterialImageResource const& Resource);
-
 	public:
 
 		template<typename E, typename ... Argument>
 		E* CreateEntity(std::string const& Name, Entity* Parent = 0, Argument&&... Arg);
+
+		Entity* CreateEntityFromModel(Model* Model);
 
 		void DestroyEntity(Entity* Entity);
 
 	public:
 
 		Transform* GetTransform(Entity* Entity);
-		Camera* GetCamera(Entity* Entity);
+
+		CameraComponent* GetCameraComponent(Entity* Entity);
 
 	public:
 
@@ -97,27 +72,19 @@ namespace hyperion
 
 	private:
 
-		std::map<Entity*, Buffer*> mSharedVertexBuffers = {};
-		std::map<Entity*, Buffer*> mSharedIndexBuffers = {};
-
-		std::vector<Material*> mSharedMaterials = {};
-
-		std::vector<std::future<AsyncMaterialImageResource>> mAsyncMaterialImageResources = {};
-
-	private:
-
 		U32 mUniqueEntityId = 0;
 
 		std::vector<Entity*> mEntities = {};
 		std::vector<Entity*> mEntitiesToBeRendered = {};
 		std::vector<Entity*> mEntitiesToBeComputed = {};
+		std::vector<Entity*> mEntitiesToBeAnimated = {};
 
-		Entity* mRoot = 0;
-		Entity* mPlayer = 0;
+		Entity* mRootEntity = 0;
+		Entity* mPlayerEntity = 0;
 
 	private:
 
-		std::map<Entity*, Camera*> mCameras = {};
+		std::map<Entity*, CameraComponent*> mCameraComponents = {};
 
 	private:
 
@@ -132,7 +99,7 @@ namespace hyperion
 	{
 		if (!Parent)
 		{
-			Parent = mRoot;
+			Parent = mRootEntity;
 		}
 
 		U32 levelIndex = (Parent) ? (Parent->GetLevelIndex() + 1) : 0;
