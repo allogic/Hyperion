@@ -37,15 +37,9 @@ namespace hyperion
 
 	Entity* Scene::CreateEntityFromModel(Model* Model)
 	{
-		// TODO: Refactor this!
-		Buffer* boneTransformBuffer = BufferVariance::CreateUniformCoherent(sizeof(R32M4) * 100);
+		Buffer* boneTransformBuffer = BufferVariance::CreateUniformCoherent(sizeof(R32M4) * 100); // TODO
 
 		R32M4* boneTransform = boneTransformBuffer->GetMappedData<R32M4>();
-
-		for (U32 i = 0; i < 100; ++i) // TODO
-		{
-			*(boneTransform + i) = R32M4{ 1.0F };
-		}
 
 		Entity* modelEntity = CreateEntity<Entity>(Model->GetName());
 

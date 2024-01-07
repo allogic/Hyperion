@@ -31,7 +31,10 @@ namespace hyperion
 		{
 			mTime += mAnimation->GetTicksPerSecond() * Window::GetDeltaTime();
 
-			mTime = fmod(mTime, mAnimation->GetDuration()); // TODO: Remove fmod
+			if (mTime >= mAnimation->GetDuration())
+			{
+				mTime = 0.0F;
+			}
 
 			R32M4 transform = R32M4{ 1.0F };
 

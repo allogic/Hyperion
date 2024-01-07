@@ -84,8 +84,6 @@ namespace hyperion
 
 	void Model::LoadMaterials(aiScene const* Scene)
 	{
-		// TODO: Empty material names?
-
 		mAsyncImageResources.resize(Scene->mNumMaterials * 17);
 
 		for (U32 materialIndex = 0, resourceIndex = 0; materialIndex < Scene->mNumMaterials; ++materialIndex, resourceIndex += 17)
@@ -296,6 +294,8 @@ namespace hyperion
 
 			char const* materialName = Scene->mMaterials[assimpMesh->mMaterialIndex]->GetName().C_Str();
 
+			assert(materialName);
+
 			Material* material = mMaterials[materialName];
 
 			assert(material);
@@ -351,7 +351,7 @@ namespace hyperion
 					char const* parentBoneName = (assimpNode->mParent) ? assimpNode->mParent->mName.C_Str() : 0;
 
 					R32M4 boneTransform = AssimpUtility::ToGlmMatrix4(assimpNode->mTransformation);
-					//R32M4 boneOffset = AssimpUtility::ToGlmMatrix4(assimpBone->mOffsetMatrix); // TODO
+					//R32M4 boneOffset = AssimpUtility::ToGlmMatrix4(assimpBone->mOffsetMatrix);
 
 					bone = AddBone(parentBoneName, boneName, boneTransform, R32M4{ 1.0F });
 				}
