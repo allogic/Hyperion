@@ -9,7 +9,7 @@
 
 namespace hyperion
 {
-	AnimatorComponent::AnimatorComponent()
+	AnimatorComponent::AnimatorComponent(ComponentArguments const& Arguments) : Component(Arguments)
 	{
 
 	}

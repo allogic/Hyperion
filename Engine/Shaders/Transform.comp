@@ -1,7 +1,15 @@
 #version 450 core
 
+struct FixedSizeBlock
+{
+	uint allocated;
+	uint accessorHigh;
+	uint accessorLow;
+};
+
 struct Transform
 {
+	FixedSizeBlock fixedSizeBlock;
 	vec3 localPosition;
 	uint reserved0;
 	vec3 localEulerAngles;
@@ -18,10 +26,10 @@ struct Transform
 	uint reserved6;
 	vec4 localRotation;
 	vec4 worldRotation;
-	uint parentIndex;
-	uint levelIndex;
 	uint allocated;
 	uint worldSpace;
+	int parentIndex;
+	uint reserved8;
 };
 
 layout(binding = 0) uniform TimeInfo
@@ -40,11 +48,6 @@ layout(binding = 2) buffer TransformBuffer
 {
 	Transform transforms[];
 } transformBuffer;
-
-layout(binding = 3) readonly buffer ParentTransformBuffer
-{
-	Transform transforms[];
-} parentTransformBuffer;
 
 layout (local_size_x = 32) in;
 
@@ -97,14 +100,14 @@ void main()
 	{
 		vec3 localEulerAngles = radians(transform.localEulerAngles);
 
-		if (transform.levelIndex == 0)
+		if (transform.parentIndex == -1)
 		{
 			transformBuffer.transforms[transformIndex].worldRotation = transform.localRotation;
 			transformBuffer.transforms[transformIndex].worldPosition = transform.localPosition;
 		}
 		else
 		{
-			Transform parentTransform = parentTransformBuffer.transforms[transform.parentIndex];
+			Transform parentTransform = transformBuffer.transforms[transform.parentIndex];
 
 			vec4 rotationX = quaternionFromAxisAngle(parentTransform.localRight, localEulerAngles.x);
 			vec4 rotationY = quaternionFromAxisAngle(parentTransform.localUp, localEulerAngles.y);

@@ -1,23 +1,20 @@
 #include <Engine/Common/Macros.h>
 
 #include <Engine/Ecs/Entity.h>
-#include <Engine/Ecs/Component.h>
 #include <Engine/Ecs/Transform.h>
 
 namespace hyperion
 {
-	Entity::Entity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId)
+	Entity::Entity(EntityArguments const& Arguments)
 	{
-		mName = Name;
-		mParent = Parent;
-		mScene = Scene;
-		mTransformIndex = TransformIndex;
-		mUniqueId = UniqueId;
+		mName = Arguments.Name;
+		mParent = Arguments.Parent;
+		mScene = Arguments.Scene;
+		mAccessor = Arguments.Accessor;
+		mUniqueId = Arguments.UniqueId;
 
 		if (mParent)
 		{
-			mLevelIndex = mParent->mLevelIndex + 1;
-
 			mParent->AddChild(this);
 		}
 	}

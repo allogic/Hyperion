@@ -2,7 +2,7 @@
 
 namespace hyperion
 {
-	ComputeComponent::ComputeComponent()
+	ComputeComponent::ComputeComponent(ComponentArguments const& Arguments) : Component(Arguments)
 	{
 
 	}

@@ -32,7 +32,7 @@ namespace hyperion
 
 	void Bone::ComputeBoneTransformRecursive(Buffer* BoneTransformBuffer, Animation* Animation, R32 Time, R32M4& ParentTransform)
 	{
-		R32M4 worldTransform = ParentTransform * Animation->ComputeTransform(this, Time);
+		R32M4 worldTransform = ParentTransform; // * Animation->ComputeTransform(this, Time);
 
 		R32M4* boneTransform = BoneTransformBuffer->GetMappedData<R32M4>() + mId;
 

@@ -39,7 +39,7 @@ namespace hyperion
 
 	public:
 
-		CameraComponent();
+		CameraComponent(ComponentArguments const& Arguments);
 		virtual ~CameraComponent();
 
 	private:

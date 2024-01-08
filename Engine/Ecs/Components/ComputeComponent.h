@@ -8,7 +8,7 @@ namespace hyperion
 	{
 	public:
 
-		ComputeComponent();
+		ComputeComponent(ComponentArguments const& Arguments);
 		virtual ~ComputeComponent();
 	};
 }

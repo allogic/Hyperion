@@ -6,11 +6,16 @@
 
 namespace hyperion
 {
+	struct ComponentArguments
+	{
+		void* Dummy;
+	};
+
 	class Component
 	{
 	public:
 
-		Component();
+		Component(ComponentArguments const& Arguments);
 		virtual ~Component();
 	};
 }

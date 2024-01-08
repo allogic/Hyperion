@@ -1,7 +1,8 @@
 #include <Engine/Scene.h>
 
-#include <Engine/Common/Types.h>
 #include <Engine/Common/Config.h>
+#include <Engine/Common/Macros.h>
+#include <Engine/Common/Types.h>
 
 #include <Engine/Ecs/Entity.h>
 
@@ -10,6 +11,9 @@
 #include <Engine/Ecs/Entities/TestEntity.h>
 
 #include <Engine/Interface/Interface.h>
+
+#include <Engine/Memory/FixedSizeAccessor.h>
+#include <Engine/Memory/FixedSizeAllocator.h>
 
 #include <Engine/Platform/Window.h>
 
@@ -48,14 +52,13 @@ I32 main()
 	Entity* modelEntity = scene->CreateEntityFromModel(model);
 
 	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Take 001"]);
-	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
-	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
+	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
+	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
 
 	scene->Commit();
 
 	Entity* rootEntity = scene->GetRootEntity();
 
-	/*
 	{
 		U32 n = 1;
 
@@ -65,7 +68,7 @@ I32 main()
 			{
 				TestEntity* testEntity = scene->CreateEntity<TestEntity>("Test");
 
-				Transform* transform = scene->GetTransform(testEntity);
+				Transform* transform = testEntity->GetTransform();
 				transform->LocalPosition = R32V3{ i * 10.0F - (n * 10.0F / 2.0F) + 5.0F, 0.0F, j * 10.0F - (n * 10.0F / 2.0F) + 5.0F };
 				transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
 				transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
@@ -74,7 +77,7 @@ I32 main()
 				{
 					testEntity = scene->CreateEntity<TestEntity>("Test", testEntity);
 
-					Transform* transform = scene->GetTransform(testEntity);
+					Transform* transform = testEntity->GetTransform();
 					transform->LocalPosition = R32V3{ 0.0F, 2.0F, 0.0F };
 					transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
 					transform->LocalScale = R32V3{ 1.0F, 1.0F, 1.0F };
@@ -83,7 +86,6 @@ I32 main()
 			}
 		}
 	}
-	*/
 
 	rootEntity->PrintHierarchy();
 	scene->PrintHierarchy();

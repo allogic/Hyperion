@@ -13,15 +13,10 @@
 #include <Engine/Ecs/Transform.h>
 #include <Engine/Ecs/TransformHierarchy.h>
 
+#include <Engine/Memory/FixedSizeAccessor.h>
+
 namespace hyperion
 {
-	constexpr R32V3 WorldRight = { 1.0F, 0.0F, 0.0F };
-	constexpr R32V3 WorldLeft = { -1.0F, 0.0F, 0.0F };
-	constexpr R32V3 WorldUp = { 0.0F, 1.0F, 0.0F };
-	constexpr R32V3 WorldDown = { 0.0F, -1.0F, 0.0F };
-	constexpr R32V3 WorldFront = { 0.0F, 0.0F, 1.0F };
-	constexpr R32V3 WorldBack = { 0.0F, 0.0F, -1.0F };
-
 	class Scene
 	{
 	public:
@@ -53,12 +48,6 @@ namespace hyperion
 
 	public:
 
-		Transform* GetTransform(Entity* Entity);
-
-		CameraComponent* GetCameraComponent(Entity* Entity);
-
-	public:
-
 		void DispatchTransformHierarchy();
 
 	public:
@@ -84,10 +73,6 @@ namespace hyperion
 
 	private:
 
-		std::map<Entity*, CameraComponent*> mCameraComponents = {};
-
-	private:
-
 		TransformHierarchy mTransformHierarchy = {};
 	};
 }
@@ -102,17 +87,11 @@ namespace hyperion
 			Parent = mRootEntity;
 		}
 
-		U32 levelIndex = (Parent) ? (Parent->GetLevelIndex() + 1) : 0;
+		FixedSizeAccessor* transformAccessor = mTransformHierarchy.AllocateTransform();
 
-		mTransformHierarchy.Update(levelIndex);
+		Entity* entity = mEntities.emplace_back(new E{ EntityArguments{ Name, Parent, this, transformAccessor, mUniqueEntityId }, std::forward<Argument>(Arg) ... });
 
-		U32 transformIndex = mTransformHierarchy.GetNextTransformIndex(levelIndex);
-
-		mTransformHierarchy.IncrementTransformCount(levelIndex);
-
-		Transform* transform = mTransformHierarchy.GetTransform(levelIndex, transformIndex);
-
-		std::memset(transform, 0, sizeof(Transform));
+		Transform* transform = entity->GetTransform();
 
 		transform->LocalPosition = R32V3{ 0.0F, 0.0F, 0.0F };
 		transform->LocalEulerAngles = R32V3{ 0.0F, 0.0F, 0.0F };
@@ -123,12 +102,9 @@ namespace hyperion
 		transform->WorldPosition = R32V3{ 0.0F, 0.0F, 0.0F };
 		transform->LocalRotation = R32Q{ 0.0F, 0.0F, 0.0F, 1.0F };
 		transform->WorldRotation = R32Q{ 0.0F, 0.0F, 0.0F, 1.0F };
-		transform->ParentIndex = (Parent) ? Parent->GetTransformIndex() : -1;
-		transform->LevelIndex = levelIndex;
 		transform->Allocated = 1;
 		transform->WorldSpace = 1;
-
-		Entity* entity = mEntities.emplace_back(new E{ Name, Parent, this, transformIndex, mUniqueEntityId, std::forward<Argument>(Arg) ... });
+		transform->ParentIndex = (Parent) ? Parent->GetTransformIndex() : -1;
 
 		mUniqueEntityId++;
 

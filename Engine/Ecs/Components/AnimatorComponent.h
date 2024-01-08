@@ -17,7 +17,7 @@ namespace hyperion
 
 	public:
 
-		AnimatorComponent();
+		AnimatorComponent(ComponentArguments const& Arguments);
 		virtual ~AnimatorComponent();
 
 	public:

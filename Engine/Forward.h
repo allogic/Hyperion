@@ -24,6 +24,11 @@ namespace hyperion
 	class GridPanel;
 	class Button;
 
+	struct FixedSizeBlock;
+
+	class FixedSizeAccessor;
+	class FixedSizeAllocator;
+
 	class Buffer;
 	class Image;
 	

@@ -2,7 +2,7 @@
 
 namespace hyperion
 {
-	CameraComponent::CameraComponent() : Component()
+	CameraComponent::CameraComponent(ComponentArguments const& Arguments) : Component(Arguments)
 	{
 
 	}

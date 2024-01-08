@@ -22,7 +22,7 @@ namespace hyperion
 
 	public:
 
-		RenderComponent();
+		RenderComponent(ComponentArguments const& Arguments);
 		virtual ~RenderComponent();
 
 	private:

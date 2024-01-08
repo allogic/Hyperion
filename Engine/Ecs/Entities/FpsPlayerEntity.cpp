@@ -1,5 +1,3 @@
-#include <Engine/Scene.h>
-
 #include <Engine/Common/Macros.h>
 
 #include <Engine/Ecs/Transform.h>
@@ -12,9 +10,9 @@
 
 namespace hyperion
 {
-	FpsPlayerEntity::FpsPlayerEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId) : Entity(Name, Parent, Scene, TransformIndex, UniqueId)
+	FpsPlayerEntity::FpsPlayerEntity(EntityArguments const& Arguments) : Entity(Arguments)
 	{
-		mCameraComponent = GetScene()->GetCameraComponent(this);
+		mCameraComponent = AttachComponent<CameraComponent>();
 	}
 
 	FpsPlayerEntity::~FpsPlayerEntity()
@@ -32,7 +30,7 @@ namespace hyperion
 
 	void FpsPlayerEntity::HandlePosition()
 	{
-		Transform* transform = GetScene()->GetTransform(this);
+		Transform* transform = GetTransform();
 
 		R32 speed = Window::KeyHeld(KeyCode::LeftShift) ? mKeyboardMoveSpeedFast : mKeyboardMoveSpeedNormal;
 
@@ -50,7 +48,7 @@ namespace hyperion
 
 	void FpsPlayerEntity::HandleRotation()
 	{
-		Transform* transform = GetScene()->GetTransform(this);
+		Transform* transform = GetTransform();
 
 		if (Window::RightMouseDown())
 		{

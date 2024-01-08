@@ -70,21 +70,6 @@ namespace hyperion
 		// TODO
 	}
 
-	Transform* Scene::GetTransform(Entity* Entity)
-	{
-		return mTransformHierarchy.GetTransform(Entity->GetLevelIndex(), Entity->GetTransformIndex());
-	}
-
-	CameraComponent* Scene::GetCameraComponent(Entity* Entity)
-	{
-		if (!mCameraComponents[Entity])
-		{
-			mCameraComponents[Entity] = new CameraComponent;
-		}
-
-		return mCameraComponents[Entity];
-	}
-
 	void Scene::DispatchTransformHierarchy()
 	{
 		mTransformHierarchy.Dispatch();

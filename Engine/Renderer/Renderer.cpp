@@ -919,9 +919,11 @@ namespace hyperion
 		{
 			if (Entity* playerEntity = Scene->GetPlayer())
 			{
-				Transform* transform = Scene->GetTransform(playerEntity);
+				Transform* transform = playerEntity->GetTransform();
 
-				CameraComponent* cameraComponent = Scene->GetCameraComponent(playerEntity);
+				//transform->WorldPosition = R32V3{ 0.0F, 5.0F, -50.0F }; // TODO
+
+				CameraComponent* cameraComponent = playerEntity->GetComponent<CameraComponent>();
 
 				gRenderer->mProjectionInfo.View = glm::lookAt(transform->WorldPosition, transform->WorldPosition + transform->LocalFront, WorldDown);
 				gRenderer->mProjectionInfo.Projection = glm::perspective(cameraComponent->GetFov(), gWindow->GetAspectRatio(), cameraComponent->GetNear(), cameraComponent->GetFar());

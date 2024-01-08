@@ -8,7 +8,7 @@ namespace hyperion
 	{
 	public:
 
-		FpsPlayerEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId);
+		FpsPlayerEntity(EntityArguments const& Arguments);
 		virtual ~FpsPlayerEntity();
 
 	public:
@@ -32,10 +32,10 @@ namespace hyperion
 		R32V2 mMousePositionDelta = {};
 
 		R32 mKeyboardMoveSpeedFast = 100.0F;
-		R32 mKeyboardMoveSpeedNormal = 0.1F;
+		R32 mKeyboardMoveSpeedNormal = 0.2F;
 
 		R32 mMouseMoveSpeedFast = 5.0F;
-		R32 mMouseMoveSpeedNormal = 0.025F;
+		R32 mMouseMoveSpeedNormal = 0.05F;
 
 		R32 mMouseRotationSpeedFast = 5.0F;
 		R32 mMouseRotationSpeedNormal = 2.0F;

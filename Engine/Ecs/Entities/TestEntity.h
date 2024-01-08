@@ -8,16 +8,12 @@ namespace hyperion
 	{
 	public:
 
-		TestEntity(std::string const& Name, Entity* Parent, Scene* Scene, U32 TransformIndex, U32 UniqueId);
+		TestEntity(EntityArguments const& Arguments);
 		virtual ~TestEntity();
 
 	public:
 
 		virtual void Update() override;
-
-	private:
-
-		Transform* mTransform = 0;
 
 	private:
 

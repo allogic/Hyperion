@@ -1539,6 +1539,15 @@
     <ClInclude Include="Ecs\Components\AnimatorComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\FixedSizeAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\FixedSizeAccessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\FixedSizeBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -1659,6 +1668,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Ecs\Components\AnimatorComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\FixedSizeAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\FixedSizeAccessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

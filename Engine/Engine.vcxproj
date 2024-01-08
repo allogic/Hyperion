@@ -574,6 +574,9 @@
     <ClInclude Include="Glm\vec3.hpp" />
     <ClInclude Include="Glm\vec4.hpp" />
     <ClInclude Include="Glm\vector_relational.hpp" />
+    <ClInclude Include="Memory\FixedSizeAccessor.h" />
+    <ClInclude Include="Memory\FixedSizeAllocator.h" />
+    <ClInclude Include="Memory\FixedSizeBlock.h" />
     <ClInclude Include="Renderer\Material.h" />
     <ClInclude Include="Renderer\Model.h" />
     <ClInclude Include="Renderer\Mesh.h" />
@@ -659,6 +662,8 @@
     <ClCompile Include="Ecs\Components\ComputeComponent.cpp" />
     <ClCompile Include="Ecs\Components\RenderComponent.cpp" />
     <ClCompile Include="Ecs\Entity.cpp" />
+    <ClCompile Include="Memory\FixedSizeAccessor.cpp" />
+    <ClCompile Include="Memory\FixedSizeAllocator.cpp" />
     <ClCompile Include="Renderer\Model.cpp" />
     <ClCompile Include="Renderer\Mesh.cpp" />
     <ClCompile Include="Utility\AssimpUtility.cpp" />
