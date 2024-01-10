@@ -1,0 +1,337 @@
+#version 450 core
+
+#define EPSILON 1.0e-6
+
+struct FixedSizeBlock
+{
+	uint allocated;
+	uint reserved0;
+	uint accessorHigh;
+	uint accessorLow;
+};
+
+struct Bone
+{
+	FixedSizeBlock fixedSizeBlock;
+	uint channelViewIndex;
+	uint allocated;
+	int parentIndex;
+	uint reserved0;
+	mat4 parentTransform;
+	mat4 offsetTransform;
+	mat4 localTransform;
+	mat4 worldTransform;
+};
+
+struct BoneChannelView
+{
+	uint offset;
+	uint count;
+};
+
+struct KeyFramePosition
+{
+	vec3 position;
+	float time;
+};
+
+struct KeyFrameRotation
+{
+	vec4 rotation;
+	float time;
+	float reserved0;
+	float reserved1;
+	float reserved2;
+};
+
+struct KeyFrameScale
+{
+	vec3 scale;
+	float time;
+};
+
+layout(binding = 0) uniform TimeInfo
+{
+	float time;
+	float deltaTime;
+} timeInfo;
+
+layout(binding = 1) uniform AnimationInfo
+{
+	float time;
+} animationInfo;
+
+layout(binding = 2) buffer BoneBuffer
+{
+	Bone bones[];
+} boneBuffer;
+
+layout(binding = 3) buffer PositionBoneChannelViewBuffer
+{
+	BoneChannelView views[];
+} positionBoneChannelViewBuffer;
+
+layout(binding = 4) buffer RotationBoneChannelViewBuffer
+{
+	BoneChannelView views[];
+} rotationBoneChannelViewBuffer;
+
+layout(binding = 5) buffer ScaleBoneChannelViewBuffer
+{
+	BoneChannelView views[];
+} scaleBoneChannelViewBuffer;
+
+layout(binding = 6) buffer PositionKeyFrameBuffer
+{
+	KeyFramePosition keys[];
+} positionKeyFrameBuffer;
+
+layout(binding = 7) buffer RotationKeyFrameBuffer
+{
+	KeyFrameRotation keys[];
+} rotationKeyFrameBuffer;
+
+layout(binding = 8) buffer ScaleKeyFrameBuffer
+{
+	KeyFrameScale keys[];
+} scaleKeyFrameBuffer;
+
+layout (local_size_x = 32) in;
+
+mat4 quaternionToMat4(vec4 q)
+{
+    float xx = q.x * q.x;
+    float yy = q.y * q.y;
+    float zz = q.z * q.z;
+    float xy = q.x * q.y;
+    float xz = q.x * q.z;
+    float yz = q.y * q.z;
+    float wx = q.w * q.x;
+    float wy = q.w * q.y;
+    float wz = q.w * q.z;
+
+    return mat4
+	(
+        1.0 - 2.0 * (yy + zz), 2.0 * (xy - wz), 2.0 * (xz + wy), 0.0,
+        2.0 * (xy + wz), 1.0 - 2.0 * (xx + zz), 2.0 * (yz - wx), 0.0,
+        2.0 * (xz - wy), 2.0 * (yz + wx), 1.0 - 2.0 * (xx + yy), 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
+}
+
+vec4 quaternionNormalize(in vec4 q)
+{
+	float d = dot(q, q);
+
+	if (d > 0.0)
+	{
+		q *= inversesqrt(d);
+	}
+
+	return q;
+}
+
+vec4 quaternionSlerp(in vec4 q0, in vec4 q1, in float t)
+{
+	float d = dot(q0, q1);
+
+	q0 = quaternionNormalize(q0);
+	q1 = quaternionNormalize(q1);
+
+	if (d < 0.0)
+	{
+		q0 = -q0;
+		d = -d;
+	}
+
+	if (d > (1.0 - EPSILON))
+	{
+		return quaternionNormalize(mix(q0, q1, t));
+	}
+	else
+	{
+		float theta = acos(d) * t;
+
+		vec4 qp = quaternionNormalize(q1 - q0 * d);
+
+		return q0 * cos(theta) + qp * sin(theta);
+	}
+}
+
+float getScaleFactor(in float lastTime, in float nextTime, in float time)
+{
+	float midWayLength = time - lastTime;
+	float framesDiff = nextTime - lastTime;
+
+	return midWayLength / framesDiff;
+}
+
+// TODO: optimize this loop away
+uint getPositionIndex(in BoneChannelView boneChannelView, in float time)
+{
+	for (uint i = 0; i < (boneChannelView.count - 1); ++i)
+	{
+		float boneKeyTime = positionKeyFrameBuffer.keys[boneChannelView.offset + i + 1].time;
+
+		if (time < boneKeyTime)
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+// TODO: optimize this loop away
+uint getRotationIndex(in BoneChannelView boneChannelView, in float time)
+{
+	for (uint i = 0; i < (boneChannelView.count - 1); ++i)
+	{
+		float boneKeyTime = rotationKeyFrameBuffer.keys[boneChannelView.offset + i + 1].time;
+
+		if (time < boneKeyTime)
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+// TODO: optimize this loop away
+uint getScaleIndex(in BoneChannelView boneChannelView, in float time)
+{
+	for (uint i = 0; i < (boneChannelView.count - 1); ++i)
+	{
+		float boneKeyTime = scaleKeyFrameBuffer.keys[boneChannelView.offset + i + 1].time;
+
+		if (time < boneKeyTime)
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+mat4 interpolatePosition(in uint boneChannelViewIndex, in float time)
+{
+	BoneChannelView boneChannelView = positionBoneChannelViewBuffer.views[boneChannelViewIndex];
+	KeyFramePosition boneKeyFrame0 = positionKeyFrameBuffer.keys[boneChannelView.offset];
+
+	if (boneChannelView.count == 1)
+	{
+		return mat4
+		(
+			1.0, 0.0, 0.0, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			boneKeyFrame0.position, 1.0
+		);
+	}
+
+	uint boneKeyFrameIndexA = getPositionIndex(boneChannelView, time);
+	uint boneKeyFrameIndexB = boneKeyFrameIndexA + 1;
+
+	KeyFramePosition boneKeyFrameA = positionKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexA];
+	KeyFramePosition boneKeyFrameB = positionKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexB];
+
+	float scaleFactor = getScaleFactor(boneKeyFrameA.time, boneKeyFrameB.time, time);
+	vec3 position = mix(boneKeyFrameA.position, boneKeyFrameB.position, scaleFactor);
+
+	return mat4
+	(
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		position, 1.0
+	);
+}
+
+mat4 interpolateRotation(in uint boneChannelViewIndex, in float time)
+{
+	BoneChannelView boneChannelView = rotationBoneChannelViewBuffer.views[boneChannelViewIndex];
+	KeyFrameRotation boneKeyFrame0 = rotationKeyFrameBuffer.keys[boneChannelView.offset];
+
+	if (boneChannelView.count == 1)
+	{
+		return quaternionToMat4(boneKeyFrame0.rotation);
+	}
+
+	uint boneKeyFrameIndexA = getRotationIndex(boneChannelView, time);
+	uint boneKeyFrameIndexB = boneKeyFrameIndexA + 1;
+
+	KeyFrameRotation boneKeyFrameA = rotationKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexA];
+	KeyFrameRotation boneKeyFrameB = rotationKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexB];
+
+	float scaleFactor = getScaleFactor(boneKeyFrameA.time, boneKeyFrameB.time, time);
+	vec4 rotation = quaternionSlerp(boneKeyFrameA.rotation, boneKeyFrameB.rotation, scaleFactor);
+
+	return quaternionToMat4(rotation);
+}
+
+mat4 interpolateScale(in uint boneChannelViewIndex, in float time)
+{
+	BoneChannelView boneChannelView = scaleBoneChannelViewBuffer.views[boneChannelViewIndex];
+	KeyFrameScale boneKeyFrame0 = scaleKeyFrameBuffer.keys[boneChannelView.offset];
+
+	if (boneChannelView.count == 1)
+	{
+		return mat4
+		(
+			boneKeyFrame0.scale.x, 0.0, 0.0, 0.0,
+			0.0, boneKeyFrame0.scale.y, 0.0, 0.0,
+			0.0, 0.0, boneKeyFrame0.scale.z, 0.0,
+			0.0, 0.0, 0.0, 1.0
+		);
+	}
+
+	uint boneKeyFrameIndexA = getScaleIndex(boneChannelView, time);
+	uint boneKeyFrameIndexB = boneKeyFrameIndexA + 1;
+
+	KeyFrameScale boneKeyFrameA = scaleKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexA];
+	KeyFrameScale boneKeyFrameB = scaleKeyFrameBuffer.keys[boneChannelView.offset + boneKeyFrameIndexB];
+
+	float scaleFactor = getScaleFactor(boneKeyFrameA.time, boneKeyFrameB.time, time);
+	vec3 scale = mix(boneKeyFrameA.scale, boneKeyFrameB.scale, scaleFactor);
+
+	return mat4
+	(
+		scale.x, 0.0, 0.0, 0.0,
+		0.0, scale.y, 0.0, 0.0,
+		0.0, 0.0, scale.z, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	);
+}
+
+void main()
+{
+	uint boneIndex = gl_GlobalInvocationID.x;
+
+	Bone bone = boneBuffer.bones[boneIndex];
+
+	if (bone.allocated == 1)
+	{
+		if (bone.parentIndex == -1)
+		{
+			boneBuffer.bones[boneIndex].parentTransform = mat4(1.0); // TODO
+			boneBuffer.bones[boneIndex].worldTransform = mat4(1.0); // TODO
+		}
+		else
+		{
+			Bone parentBone = boneBuffer.bones[bone.parentIndex];
+
+			uint channelIndex = bone.channelViewIndex;
+			float animationTime = animationInfo.time;
+
+			mat4 position = interpolatePosition(channelIndex, animationTime);
+			mat4 rotation = interpolateRotation(channelIndex, animationTime);
+			mat4 scale = interpolateScale(channelIndex, animationTime);
+
+			mat4 worldTransform = parentBone.worldTransform * position * scale;
+
+			boneBuffer.bones[boneIndex].parentTransform = worldTransform * bone.offsetTransform;
+			boneBuffer.bones[boneIndex].worldTransform = worldTransform;
+		}
+	}
+}

@@ -2,8 +2,11 @@
 
 namespace hyperion
 {
+	struct Bone;
+
 	class Animation;
-	class Bone;
+	class BoneHierarchy;
+	class BoneInfo;
 	class Skeleton;
 
 	class Timer;
@@ -46,5 +49,4 @@ namespace hyperion
 	class Component;
 	class Entity;
 	class TransformHierarchy;
-	class TransformHierarchyLevel;
 }

@@ -3,9 +3,11 @@
 #include <string>
 #include <map>
 
-#include <Engine/Forward.h>
+#include <Engine/Animation/BoneHierarchy.h>
 
 #include <Engine/Common/Types.h>
+
+#include <Engine/Memory/FixedSizeAccessor.h>
 
 namespace hyperion
 {
@@ -13,11 +15,7 @@ namespace hyperion
 	{
 	public:
 
-		inline auto GetRootBone() const { return mRootBone; }
-
-	public:
-
-		inline void SetRootBone(Bone* Value) { mRootBone = Value; }
+		inline auto GetBuffer() const { return mBoneHierarchy.GetBuffer(); }
 
 	public:
 
@@ -26,15 +24,30 @@ namespace hyperion
 
 	public:
 
-		void ComputeBoneTransformRecursive(Buffer* BoneTransformBuffer, Animation* Animation, R32 Time, R32M4& ParentTransform);
+		BoneInfo* CreateBone(std::string const& Name, std::string const& ParentName, R32M4 const& Transform, R32M4 const& Offset);
+		BoneInfo* FindBone(std::string const& Name);
 
 	public:
 
-		void PrintHierarchy(U32 Offset = 0, U32 Indent = 0, U32 Increment = 2);
-		void DrawHierarchy();
+		void SetAnimation(Animation* Animation);
+
+	public:
+
+		void BuildBoneHierarchy();
+		void DispatchBoneHierarchy();
+
+	public:
+
+		void PrintHierarchy();
 
 	private:
 
-		Bone* mRootBone = 0;
+		std::map<std::string, BoneInfo*> mBoneInfos = {};
+
+		BoneInfo* mRootBoneInfo = 0;
+
+	private:
+
+		BoneHierarchy mBoneHierarchy = {};
 	};
 }

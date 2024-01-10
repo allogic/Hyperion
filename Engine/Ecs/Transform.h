@@ -34,6 +34,6 @@ namespace hyperion
 		U32 Allocated;
 		U32 WorldSpace;
 		I32 ParentIndex;
-		U32 Reserved8;
+		U32 Reserved7;
 	};
 }

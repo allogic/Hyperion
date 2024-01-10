@@ -6,6 +6,8 @@ namespace hyperion
 	{
 		std::vector<U8> bytes = {};
 
+		assert(std::filesystem::exists(File));
+
 		std::ifstream stream = std::ifstream{ File, std::ios::ate | std::ios::binary };
 
 		if (stream.is_open())

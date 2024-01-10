@@ -45,19 +45,16 @@ I32 main()
 	auto animations = model->GetAnimations(); // TODO: Refactor this!
 
 	model->PrintStats();
-	model->PrintSkeletonHierarchy();
 
 	Scene* scene = new Scene;
 
 	Entity* modelEntity = scene->CreateEntityFromModel(model);
 
 	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Take 001"]);
-	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
-	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
+	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
+	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
 
 	scene->Commit();
-
-	Entity* rootEntity = scene->GetRootEntity();
 
 	{
 		U32 n = 1;
@@ -87,7 +84,6 @@ I32 main()
 		}
 	}
 
-	rootEntity->PrintHierarchy();
 	scene->PrintHierarchy();
 
 	while (!Window::ShouldClose())

@@ -392,7 +392,7 @@ namespace hyperion
 
 		Material* material = renderComponent->GetSharedMaterial();
 
-		Buffer* boneTransformBuffer = renderComponent->GetSharedBoneTransformBuffer();
+		Buffer* boneBuffer = renderComponent->GetSharedBoneBuffer();
 
 		Image* baseColorImage = material->GetBaseColorImage();
 		Image* normalCameraImage = material->GetNormalCameraImage();
@@ -413,8 +413,8 @@ namespace hyperion
 
 		VkDescriptorBufferInfo boneInfoDescriptorBufferInfo = {};
 		boneInfoDescriptorBufferInfo.offset = 0;
-		boneInfoDescriptorBufferInfo.buffer = boneTransformBuffer->GetBuffer();
-		boneInfoDescriptorBufferInfo.range = boneTransformBuffer->GetSize();
+		boneInfoDescriptorBufferInfo.buffer = boneBuffer->GetBuffer();
+		boneInfoDescriptorBufferInfo.range = boneBuffer->GetSize();
 
 		VkDescriptorImageInfo baseColorDescriptorImageInfo = {};
 		baseColorDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
@@ -476,7 +476,7 @@ namespace hyperion
 		writeDescriptorSets[2].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
 		writeDescriptorSets[2].dstBinding = 2;
 		writeDescriptorSets[2].dstArrayElement = 0;
-		writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		writeDescriptorSets[2].descriptorCount = 1;
 		writeDescriptorSets[2].pImageInfo = 0;
 		writeDescriptorSets[2].pBufferInfo = &boneInfoDescriptorBufferInfo;
@@ -777,31 +777,34 @@ namespace hyperion
 #endif
 
 		{
-			vkCmdBindPipeline(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipeline);
-
-			auto const& entities = Scene->GetEntitiesToBeRendered();
-
-			for (U32 i = 0; i < entities.size(); ++i)
+			if (Scene)
 			{
-				RenderComponent* renderComponent = entities[i]->GetComponent<RenderComponent>();
+				vkCmdBindPipeline(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipeline);
 
-				if (renderComponent)
+				auto const& entities = Scene->GetEntitiesToBeRendered();
+
+				for (U32 i = 0; i < entities.size(); ++i)
 				{
-					Buffer* sharedVertexBuffer = renderComponent->GetSharedVertexBuffer();
-					Buffer* sharedIndexBuffer = renderComponent->GetSharedIndexBuffer();
+					RenderComponent* renderComponent = entities[i]->GetComponent<RenderComponent>();
 
-					std::vector<VkBuffer> defaultVertexBuffers = { sharedVertexBuffer->GetBuffer() };
-					std::vector<U64> defaultOffsets = { 0 };
+					if (renderComponent)
+					{
+						Buffer* sharedVertexBuffer = renderComponent->GetSharedVertexBuffer();
+						Buffer* sharedIndexBuffer = renderComponent->GetSharedIndexBuffer();
 
-					vkCmdBindDescriptorSets(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipelineLayout, 0, 1, &mPhysicallyBasedDescriptorSets[i], 0, 0);
-					vkCmdBindVertexBuffers(mGraphicCommandBuffer, PhysicallyBasedVertexBindingId, 1, defaultVertexBuffers.data(), defaultOffsets.data());
-					vkCmdBindIndexBuffer(mGraphicCommandBuffer, sharedIndexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+						std::vector<VkBuffer> defaultVertexBuffers = { sharedVertexBuffer->GetBuffer() };
+						std::vector<U64> defaultOffsets = { 0 };
 
-					//vkCmdPushConstants(mGraphicCommandBuffer, mPhysicallyBasedPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PerEntityData), &perEntityData);
+						vkCmdBindDescriptorSets(mGraphicCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPhysicallyBasedPipelineLayout, 0, 1, &mPhysicallyBasedDescriptorSets[i], 0, 0);
+						vkCmdBindVertexBuffers(mGraphicCommandBuffer, PhysicallyBasedVertexBindingId, 1, defaultVertexBuffers.data(), defaultOffsets.data());
+						vkCmdBindIndexBuffer(mGraphicCommandBuffer, sharedIndexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-					U32 indexCount = (U32)(sharedIndexBuffer->GetSize() / sizeof(U32));
+						//vkCmdPushConstants(mGraphicCommandBuffer, mPhysicallyBasedPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PerEntityData), &perEntityData);
 
-					vkCmdDrawIndexed(mGraphicCommandBuffer, indexCount, 1, 0, 0, 0);
+						U32 indexCount = (U32)(sharedIndexBuffer->GetSize() / sizeof(U32));
+
+						vkCmdDrawIndexed(mGraphicCommandBuffer, indexCount, 1, 0, 0, 0);
+					}
 				}
 			}
 		}
@@ -878,6 +881,17 @@ namespace hyperion
 		if (Scene)
 		{
 			Scene->DispatchTransformHierarchy();
+
+			auto const& entities = Scene->GetEntitiesToBeAnimated();
+
+			for (U32 i = 0; i < entities.size(); ++i)
+			{
+				AnimatorComponent* animatorComponent = entities[i]->GetComponent<AnimatorComponent>();
+
+				Skeleton* skeleton = animatorComponent->GetSharedSkeleton();
+
+				skeleton->DispatchBoneHierarchy();
+			}
 		}
 
 #ifdef _DEBUG
@@ -920,8 +934,6 @@ namespace hyperion
 			if (Entity* playerEntity = Scene->GetPlayer())
 			{
 				Transform* transform = playerEntity->GetTransform();
-
-				//transform->WorldPosition = R32V3{ 0.0F, 5.0F, -50.0F }; // TODO
 
 				CameraComponent* cameraComponent = playerEntity->GetComponent<CameraComponent>();
 
@@ -1415,7 +1427,7 @@ namespace hyperion
 	{
 		if (Skeleton)
 		{
-			Skeleton->DrawHierarchy();
+			//Skeleton->DrawHierarchy(); // TODO
 		}
 	}
 }

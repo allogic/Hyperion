@@ -8,11 +8,10 @@ namespace hyperion
 	{
 	public:
 
-		inline auto GetBoneTransformBuffer() const { return mBoneTransformBuffer; }
+		inline auto GetSharedSkeleton() const { return mSharedSkeleton; }
 
 	public:
 
-		inline void SetBoneTransformBuffer(Buffer* Value) { mBoneTransformBuffer = Value; }
 		inline void SetSharedSkeleton(Skeleton* Value) { mSharedSkeleton = Value; }
 
 	public:
@@ -27,11 +26,13 @@ namespace hyperion
 
 	private:
 
-		Buffer* mBoneTransformBuffer = 0;
+		Animation* mSharedAnimation = 0;
+		Skeleton* mSharedSkeleton = 0;
+
+	private:
 
 		R32 mTime = 0.0F;
 
-		Animation* mAnimation = 0;
-		Skeleton* mSharedSkeleton = 0;
+		bool mPlaying = false;
 	};
 }

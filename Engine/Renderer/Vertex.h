@@ -34,7 +34,7 @@ namespace hyperion
 		R32V3 TexCoordChannel5;
 		R32V3 TexCoordChannel6;
 		R32V3 TexCoordChannel7;
-		I32V4 BoneIds;
+		I32V4 BoneIndices;
 		R32V4 BoneWeights;
 	};
 

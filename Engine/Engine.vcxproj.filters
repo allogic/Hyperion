@@ -1521,9 +1521,6 @@
     <ClInclude Include="Utility\AssimpUtility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Skeleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1546,6 +1543,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Memory\FixedSizeBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\BoneHierarchy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Skeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\BoneInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1652,9 +1658,6 @@
     <ClCompile Include="Utility\AssimpUtility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\Skeleton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Animation\Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1664,9 +1667,6 @@
     <ClCompile Include="Renderer\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\Bone.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Ecs\Components\AnimatorComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1674,6 +1674,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Memory\FixedSizeAccessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\BoneHierarchy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Skeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\BoneInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2118,6 +2127,7 @@
     <None Include="Shaders\PhysicallyBased.vert" />
     <None Include="Shaders\Text.frag" />
     <None Include="Shaders\Text.vert" />
-    <None Include="Shaders\Transform.comp" />
+    <None Include="Shaders\TransformHierarchy.comp" />
+    <None Include="Shaders\BoneHierarchy.comp" />
   </ItemGroup>
 </Project>

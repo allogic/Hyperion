@@ -1,30 +1,26 @@
 #version 450 core
 
-#define MAX_BONES 100
 #define MAX_BONE_INFLUENCE 4
 
-struct Transform
+struct FixedSizeBlock
 {
-	vec3 localPosition;
-	uint reserved0;
-	vec3 localEulerAngles;
-	uint reserved1;
-	vec3 localScale;
-	uint reserved2;
-	vec3 localRight;
-	uint reserved3;
-	vec3 localUp;
-	uint reserved4;
-	vec3 localFront;
-	uint reserved5;
-	vec3 worldPosition;
-	uint reserved6;
-	vec4 localRotation;
-	vec4 worldRotation;
-	uint parentIndex;
-	uint levelIndex;
 	uint allocated;
-	uint worldSpace;
+	uint reserved0;
+	uint accessorHigh;
+	uint accessorLow;
+};
+
+struct Bone
+{
+	FixedSizeBlock fixedSizeBlock;
+	uint channelViewIndex;
+	uint allocated;
+	int parentIndex;
+	uint reserved0;
+	mat4 parentTransform;
+	mat4 offsetTransform;
+	mat4 localTransform;
+	mat4 worldTransform;
 };
 
 layout(location = 0) in vec3 vertexPosition;
@@ -47,7 +43,7 @@ layout(location = 16) in vec3 vertexTexCoordChannel4;
 layout(location = 17) in vec3 vertexTexCoordChannel5;
 layout(location = 18) in vec3 vertexTexCoordChannel6;
 layout(location = 19) in vec3 vertexTexCoordChannel7;
-layout(location = 20) in ivec4 vertexBoneIds;
+layout(location = 20) in ivec4 vertexBoneIndices;
 layout(location = 21) in vec4 vertexBoneWeights;
 
 layout(binding = 0) uniform TimeInfo
@@ -62,10 +58,10 @@ layout(binding = 1) uniform ProjectionInfo
 	mat4 projection;
 } projectionInfo;
 
-layout(binding = 2) uniform BoneInfo
+layout(binding = 2) buffer BoneBuffer
 {
-	mat4 boneTransforms[MAX_BONES];
-} boneInfo;
+	Bone bones[];
+} boneBuffer;
 
 layout(location = 0) out vec3 outputPosition;
 layout(location = 1) out vec3 outputNormal;
@@ -94,23 +90,19 @@ void main()
 
 	for (uint i = 0; i < MAX_BONE_INFLUENCE; ++i)
 	{
-		if (vertexBoneIds[i] == -1)
+		if (vertexBoneIndices[i] >= 0)
 		{
-			continue;
+			Bone bone = boneBuffer.bones[vertexBoneIndices[i]];
+
+			if (bone.allocated == 1)
+			{
+				vec4 localPosition = bone.parentTransform * vec4(vertexPosition, 1.0);
+	
+				worldPosition += localPosition * vertexBoneWeights[i];
+
+				//vec3 localNormal = mat3(boneInfo.boneTransforms[vertexBoneIds[i]]) * vertexNormal; // TODO
+			}	
 		}
-
-		if (vertexBoneIds[i] >= MAX_BONES)
-		{
-			worldPosition = vec4(vertexPosition, 1.0);
-
-			break;
-		}
-
-		vec4 localPosition = boneInfo.boneTransforms[vertexBoneIds[i]] * vec4(vertexPosition, 1.0);
-
-		worldPosition += localPosition * vertexBoneWeights[i];
-
-		//vec3 localNormal = mat3(boneInfo.boneTransforms[vertexBoneIds[i]]) * vertexNormal; // TODO
 	}
 
 	worldPosition = projectionInfo.projection * projectionInfo.view * worldPosition;

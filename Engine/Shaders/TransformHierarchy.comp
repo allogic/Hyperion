@@ -3,6 +3,7 @@
 struct FixedSizeBlock
 {
 	uint allocated;
+	uint reserved0;
 	uint accessorHigh;
 	uint accessorLow;
 };
@@ -29,47 +30,21 @@ struct Transform
 	uint allocated;
 	uint worldSpace;
 	int parentIndex;
-	uint reserved8;
+	uint reserved7;
 };
 
-layout(binding = 0) uniform TimeInfo
-{
-	float time;
-	float deltaTime;
-} timeInfo;
-
-layout(binding = 1) uniform ProjectionInfo
-{
-	mat4 view;
-	mat4 projection;
-} projectionInfo;
-
-layout(binding = 2) buffer TransformBuffer
+layout(binding = 0) buffer TransformBuffer
 {
 	Transform transforms[];
 } transformBuffer;
 
 layout (local_size_x = 32) in;
 
-vec4 conjugateQuaternion(in vec4 q)
-{
-	return vec4(-q.x, -q.y, -q.z, q.w);
-}
-
-vec4 inverseQuaternion(in vec4 q)
-{
-	return conjugateQuaternion(q) / dot(q, q);
-}
-
-vec4 normalizeQuaternion(in vec4 q)
-{
-    return q / sqrt(dot(q, q));
-}
-
 vec4 multiplyQuaternions(in vec4 q, in vec4 b)
 {
     float w1 = q.w, x1 = q.x, y1 = q.y, z1 = q.z;
     float w2 = b.w, x2 = b.x, y2 = b.y, z2 = b.z;
+
     return vec4
 	(
 		w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
@@ -82,6 +57,7 @@ vec4 multiplyQuaternions(in vec4 q, in vec4 b)
 vec4 quaternionFromAxisAngle(in vec3 v, in float a)
 {
     float h = a * 0.5;
+
     return vec4(v * sin(h), cos(h));
 }
 
@@ -114,6 +90,7 @@ void main()
 			vec4 rotationZ = quaternionFromAxisAngle(parentTransform.localFront, localEulerAngles.z);
 
 			vec4 localRotation = rotationY;
+
 			localRotation = multiplyQuaternions(rotationX, localRotation);
 			localRotation = multiplyQuaternions(rotationZ, localRotation);
 

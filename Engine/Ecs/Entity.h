@@ -74,7 +74,6 @@ namespace hyperion
 	private:
 
 		std::string mName = "";
-
 		Entity* mParent = 0;
 		Scene* mScene = 0;
 		FixedSizeAccessor* mAccessor = 0;

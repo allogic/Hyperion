@@ -33,11 +33,6 @@ namespace hyperion
 		R32M4 View;
 		R32M4 Projection;
 	};
-
-	struct BoneInfo
-	{
-		R32M4 Bones[100];
-	};
 #pragma pack (pop)
 
 	struct CharacterInfo
@@ -192,7 +187,7 @@ namespace hyperion
 		{
 			{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
 			{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
-			{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
+			{ 2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, 0 },
 
 			{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
 			{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, 0 },
@@ -237,7 +232,7 @@ namespace hyperion
 			{ 18, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel6) },
 			{ 19, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32_SFLOAT, offsetof(PhysicallyBasedVertex, TexCoordChannel7) },
 
-			{ 20, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SINT, offsetof(PhysicallyBasedVertex, BoneIds) },
+			{ 20, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SINT, offsetof(PhysicallyBasedVertex, BoneIndices) },
 			{ 21, PhysicallyBasedVertexBindingId, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(PhysicallyBasedVertex, BoneWeights) },
 		};
 

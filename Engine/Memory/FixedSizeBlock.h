@@ -8,8 +8,8 @@ namespace hyperion
 {
 	struct FixedSizeBlock
 	{
-		U32 Allocated : 1;
-		U32 Reserved : 31;
+		U32 Allocated;
+		U32 Reserved0;
 		FixedSizeAccessor* Accessor;
 	};
 }

@@ -23,8 +23,9 @@ namespace hyperion
 
 		inline auto GetRootEntity() const { return mRootEntity; }
 		inline auto const& GetEntities() const { return mEntities; }
-		inline auto const& GetEntitiesToBeRendered() const { return mEntitiesToBeRendered; }
+		inline auto const& GetEntitiesToBeAnimated() const { return mEntitiesToBeAnimated; }
 		inline auto const& GetEntitiesToBeComputed() const { return mEntitiesToBeComputed; }
+		inline auto const& GetEntitiesToBeRendered() const { return mEntitiesToBeRendered; }
 		inline auto GetPlayer() const { return mPlayerEntity; }
 
 	public:

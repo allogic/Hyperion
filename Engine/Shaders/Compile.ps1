@@ -10,4 +10,5 @@ glslc Interface.frag -o Interface.frag.spv
 glslc Debug.vert -o Debug.vert.spv
 glslc Debug.frag -o Debug.frag.spv
 
-glslc Transform.comp -o Transform.comp.spv
+glslc BoneHierarchy.comp -o BoneHierarchy.comp.spv
+glslc TransformHierarchy.comp -o TransformHierarchy.comp.spv

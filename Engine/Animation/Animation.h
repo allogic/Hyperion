@@ -10,22 +10,36 @@
 
 namespace hyperion
 {
-	struct KeyPosition
+	struct AnimationInfo
 	{
 		R32 Time;
+	};
+
+	struct BoneChannelView
+	{
+		U32 Offset;
+		U32 Count;
+	};
+
+	struct KeyFramePosition
+	{
 		R32V3 Position;
+		R32 Time;
 	};
 
-	struct KeyRotation
+	struct KeyFrameRotation
 	{
-		R32 Time;
 		R32Q Rotation;
+		R32 Time;
+		U32 Reserved0;
+		U32 Reserved1;
+		U32 Reserved2;
 	};
 
-	struct KeyScale
+	struct KeyFrameScale
 	{
-		R32 Time;
 		R32V3 Scale;
+		R32 Time;
 	};
 
 	class Animation
@@ -34,56 +48,36 @@ namespace hyperion
 
 		inline auto GetDuration() const { return mDuration; }
 		inline auto GetTicksPerSecond() const { return mTicksPerSecond; }
+		inline auto GetAnimationInfoBuffer() const { return mAnimationInfoBuffer; }
+		inline auto GetPositionBoneChannelViewBuffer() const { return mPositionBoneChannelViewBuffer; }
+		inline auto GetRotationBoneChannelViewBuffer() const { return mRotationBoneChannelViewBuffer; }
+		inline auto GetScaleBoneChannelViewBuffer() const { return mScaleBoneChannelViewBuffer; }
+		inline auto GetPositionKeyFrameBuffer() const { return mPositionKeyFrameBuffer; }
+		inline auto GetRotationKeyFrameBuffer() const { return mRotationKeyFrameBuffer; }
+		inline auto GetScaleKeyFrameBuffer() const { return mScaleKeyFrameBuffer; }
 
 	public:
 
-		Animation(std::string const& Name, R32 Duration, R32 TicksPerSecond);
+		Animation(std::string const& Name, R32 Duration, R32 TicksPerSecond, std::vector<BoneChannelView> const& PositionBoneChannelView, std::vector<BoneChannelView> const& RotationBoneChannelView, std::vector<BoneChannelView> const& ScaleBoneChannelView, std::vector<KeyFramePosition> const& PositionKeyFrames, std::vector<KeyFrameRotation> const& RotationKeyFrames, std::vector<KeyFrameScale> const& ScaleKeyFrames);
 		virtual ~Animation();
-
-	public:
-
-		void AddPositionKey(Bone* Bone, R32 Time, R32V3 const& Position);
-		void AddRotationKey(Bone* Bone, R32 Time, R32Q const& Rotation);
-		void AddScaleKey(Bone* Bone, R32 Time, R32V3 const& Scale);
-
-	public:
-
-		R32M4 ComputeTransform(Bone* Bone, R32 Time);
-
-	public:
-
-		U32 GetPositionIndex(Bone* Bone, R32 Time);
-		U32 GetRotationIndex(Bone* Bone, R32 Time);
-		U32 GetScaleIndex(Bone* Bone, R32 Time);
-
-	private:
-
-		R32 GetScaleFactor(R32 LastTime, R32 NextTime, R32 Time);
-
-	private:
-
-		R32M4 InterpolatePosition(Bone* Bone, R32 Time);
-		R32M4 InterpolateRotation(Bone* Bone, R32 Time);
-		R32M4 InterpolateScale(Bone* Bone, R32 Time);
 
 	private:
 
 		std::string mName = "";
 
 		R32 mDuration = 0.0F;
-
-		R32 mTicksPerSecond = 0;
-
-		R32M4 mLocalTransform = {};
+		R32 mTicksPerSecond = 0.0F;
 
 	private:
 
-		std::map<Bone*, std::vector<KeyPosition>> mPositions = {};
-		std::map<Bone*, std::vector<KeyRotation>> mRotations = {};
-		std::map<Bone*, std::vector<KeyScale>> mScales = {};
+		Buffer* mAnimationInfoBuffer = 0;
 
-	private:
+		Buffer* mPositionBoneChannelViewBuffer = 0;
+		Buffer* mRotationBoneChannelViewBuffer = 0;
+		Buffer* mScaleBoneChannelViewBuffer = 0;
 
-		Skeleton* mSkeleton = 0;
+		Buffer* mPositionKeyFrameBuffer = 0;
+		Buffer* mRotationKeyFrameBuffer = 0;
+		Buffer* mScaleKeyFrameBuffer = 0;
 	};
 }

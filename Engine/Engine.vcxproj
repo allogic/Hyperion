@@ -137,6 +137,8 @@
   <ItemGroup>
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\Bone.h" />
+    <ClInclude Include="Animation\BoneHierarchy.h" />
+    <ClInclude Include="Animation\BoneInfo.h" />
     <ClInclude Include="Animation\Skeleton.h" />
     <ClInclude Include="Assimp\aabb.h" />
     <ClInclude Include="Assimp\ai_assert.h" />
@@ -649,7 +651,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\Animation.cpp" />
-    <ClCompile Include="Animation\Bone.cpp" />
+    <ClCompile Include="Animation\BoneHierarchy.cpp" />
+    <ClCompile Include="Animation\BoneInfo.cpp" />
     <ClCompile Include="Animation\Skeleton.cpp" />
     <ClCompile Include="Ecs\Components\AnimatorComponent.cpp" />
     <ClCompile Include="Ecs\Entities\FpsPlayerEntity.cpp" />
@@ -842,9 +845,10 @@
     <None Include="Shaders\Interface.vert" />
     <None Include="Shaders\PhysicallyBased.frag" />
     <None Include="Shaders\PhysicallyBased.vert" />
+    <None Include="Shaders\BoneHierarchy.comp" />
     <None Include="Shaders\Text.frag" />
     <None Include="Shaders\Text.vert" />
-    <None Include="Shaders\Transform.comp" />
+    <None Include="Shaders\TransformHierarchy.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

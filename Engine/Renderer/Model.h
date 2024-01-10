@@ -9,6 +9,8 @@
 
 #include <Engine/Forward.h>
 
+#include <Engine/Animation/BoneHierarchy.h>
+
 #include <Engine/Common/Types.h>
 
 struct aiScene;
@@ -54,19 +56,9 @@ namespace hyperion
 		void LoadMeshes(aiScene const* Scene);
 		void LoadAnimations(aiScene const* Scene);
 
-	private:
-
-		void BuildSkeletonHierarchy();
-
 	public:
 
 		void PrintStats();
-		void PrintSkeletonHierarchy(U32 Offset = 0, U32 Indent = 0, U32 Increment = 2);
-
-	public:
-
-		Bone* AddBone(std::string const& ParentName, std::string const& Name, R32M4 const& Transform, R32M4 const& Offset);
-		Bone* FindBone(std::string const& Name);
 
 	private:
 
@@ -81,10 +73,9 @@ namespace hyperion
 
 		std::map<std::string, Material*> mMaterials = {};
 		std::map<std::string, Mesh*> mMeshes = {};
-		std::map<std::string, Bone*> mBones = {};
 		std::map<std::string, Animation*> mAnimations = {};
 
-		U32 mUniqueBoneId = 0;
+	private:
 
 		Skeleton* mSkeleton = 0;
 

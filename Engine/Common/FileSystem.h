@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <cassert>
 
 #include <Engine/Common/Types.h>
 

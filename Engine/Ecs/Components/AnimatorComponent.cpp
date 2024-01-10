@@ -16,29 +16,32 @@ namespace hyperion
 
 	AnimatorComponent::~AnimatorComponent()
 	{
-		delete mBoneTransformBuffer;
+
 	}
 
 	void AnimatorComponent::Play(Animation* Animation)
 	{
-		mAnimation = Animation;
+		mSharedAnimation = Animation;
+		mSharedSkeleton->SetAnimation(Animation);
+
 		mTime = 0.0F;
+		mPlaying = true;
 	}
 
 	void AnimatorComponent::Update()
 	{
-		if (mAnimation)
+		if (mPlaying)
 		{
-			mTime += mAnimation->GetTicksPerSecond() * Window::GetDeltaTime();
+			Buffer* animationInfoBuffer = mSharedAnimation->GetAnimationInfoBuffer();
 
-			if (mTime >= mAnimation->GetDuration())
+			AnimationInfo* animationInfo = animationInfoBuffer->GetMappedData<AnimationInfo>();
+
+			animationInfo->Time += mSharedAnimation->GetTicksPerSecond() * Window::GetDeltaTime();
+			
+			if (animationInfo->Time >= mSharedAnimation->GetDuration())
 			{
-				mTime = 0.0F;
+				animationInfo->Time = 0.0F;
 			}
-
-			R32M4 transform = R32M4{ 1.0F };
-
-			mSharedSkeleton->ComputeBoneTransformRecursive(mBoneTransformBuffer, mAnimation, mTime, transform);
 		}
 	}
 }

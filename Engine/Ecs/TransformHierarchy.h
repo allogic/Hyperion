@@ -30,7 +30,6 @@ namespace hyperion
 	public:
 
 		void Dispatch();
-		void Print();
 
 	private:
 
@@ -38,13 +37,11 @@ namespace hyperion
 
 		FixedSizeAllocator* mTransformAllocator = 0;
 
-		std::string mComputeFile = ROOT_PATH "Engine\\Shaders\\Transform.comp.spv";
+		std::string mComputeFile = ROOT_PATH "Engine\\Shaders\\TransformHierarchy.comp.spv";
 		
 		std::vector<VkDescriptorSetLayoutBinding> mDescriptorSetLayoutBindings =
 		{
-			{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0 },
-			{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0 },
-			{ 2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0 },
+			{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT, 0 },
 		};
 
 		std::vector<VkPushConstantRange> mPushConstantRanges =

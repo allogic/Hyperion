@@ -1,5 +1,7 @@
 #include <Engine/Scene.h>
 
+#include <Engine/Animation/Skeleton.h>
+
 #include <Engine/Common/Macros.h>
 
 #include <Engine/Ecs/Entities/FpsPlayerEntity.h>
@@ -37,16 +39,13 @@ namespace hyperion
 
 	Entity* Scene::CreateEntityFromModel(Model* Model)
 	{
-		Buffer* boneTransformBuffer = BufferVariance::CreateUniformCoherent(sizeof(R32M4) * 100); // TODO
-
-		R32M4* boneTransform = boneTransformBuffer->GetMappedData<R32M4>();
-
 		Entity* modelEntity = CreateEntity<Entity>(Model->GetName());
+
+		Skeleton* skeleton = Model->GetSkeleton();
 
 		AnimatorComponent* animatorComponent = modelEntity->AttachComponent<AnimatorComponent>();
 
-		animatorComponent->SetBoneTransformBuffer(boneTransformBuffer);
-		animatorComponent->SetSharedSkeleton(Model->GetSkeleton());
+		animatorComponent->SetSharedSkeleton(skeleton);
 
 		Entity* meshEntity = modelEntity;
 
@@ -57,7 +56,7 @@ namespace hyperion
 			RenderComponent* renderComponent = meshEntity->AttachComponent<RenderComponent>();
 
 			renderComponent->SetSharedMaterial(mesh->GetSharedMaterial());
-			renderComponent->SetSharedBoneTransformBuffer(boneTransformBuffer);
+			renderComponent->SetSharedBoneBuffer(skeleton->GetBuffer());
 			renderComponent->SetSharedVertexBuffer(mesh->GetVertexBuffer());
 			renderComponent->SetSharedIndexBuffer(mesh->GetIndexBuffer());
 		}
@@ -77,7 +76,7 @@ namespace hyperion
 
 	void Scene::PrintHierarchy()
 	{
-		mTransformHierarchy.Print();
+		mRootEntity->PrintHierarchy();
 	}
 
 	void Scene::Commit()
