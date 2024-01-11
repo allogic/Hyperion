@@ -25,7 +25,8 @@ namespace hyperion
 	{
 		static auto randomDevice = std::random_device{};
 		static auto generator = std::mt19937{ randomDevice() };
-		static auto distribution = std::uniform_int_distribution<T>{ Min, Max };
+
+		auto distribution = std::uniform_int_distribution<T>{ Min, Max };
 
 		return distribution(generator);
 	}
@@ -35,7 +36,8 @@ namespace hyperion
 	{
 		static auto randomDevice = std::random_device{};
 		static auto generator = std::mt19937{ randomDevice() };
-		static auto distribution = std::uniform_real_distribution<T>{ Min, Max };
+
+		auto distribution = std::uniform_real_distribution<T>{ Min, Max };
 
 		return distribution(generator);
 	}

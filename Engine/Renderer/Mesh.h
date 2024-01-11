@@ -15,13 +15,13 @@ namespace hyperion
 	{
 	public:
 
-		inline auto GetSharedMaterial() const { return mSharedMaterial; }
+		inline auto GetMaterial() const { return mMaterial; }
 		inline auto GetVertexBuffer() const { return mVertexBuffer; }
 		inline auto GetIndexBuffer() const { return mIndexBuffer; }
 
 	public:
 
-		inline void SetSharedMaterial(Material* Value) { mSharedMaterial = Value; }
+		inline void SetMaterial(Material* Value) { mMaterial = Value; }
 		inline void SetVertexBuffer(Buffer* Value) { mVertexBuffer = Value; }
 		inline void SetIndexBuffer(Buffer* Value) { mIndexBuffer = Value; }
 
@@ -32,7 +32,7 @@ namespace hyperion
 
 	private:
 
-		Material* mSharedMaterial = 0;
+		Material* mMaterial = 0;
 
 		Buffer* mVertexBuffer = 0;
 		Buffer* mIndexBuffer = 0;

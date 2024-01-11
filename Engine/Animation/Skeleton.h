@@ -15,7 +15,7 @@ namespace hyperion
 	{
 	public:
 
-		inline auto GetBuffer() const { return mBoneHierarchy.GetBuffer(); }
+		inline auto GetBoneBuffer() const { return mBoneHierarchy.GetBoneBuffer(); }
 
 	public:
 
@@ -29,7 +29,11 @@ namespace hyperion
 
 	public:
 
-		void SetAnimation(Animation* Animation);
+		void AddAnimation(AnimatorComponent* AnimatorComponent, Animation* Animation);
+
+	public:
+
+		Buffer* CopyBoneBuffer();
 
 	public:
 
@@ -39,10 +43,12 @@ namespace hyperion
 	public:
 
 		void PrintHierarchy();
+		void DrawHierarchy(U32 Color);
 
 	private:
 
 		std::map<std::string, BoneInfo*> mBoneInfos = {};
+		std::map<AnimatorComponent*, Animation*> mAnimationSampler = {};
 
 		BoneInfo* mRootBoneInfo = 0;
 

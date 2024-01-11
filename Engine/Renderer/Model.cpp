@@ -57,7 +57,6 @@ namespace hyperion
 		LoadAnimations(Scene);
 
 		mSkeleton->BuildBoneHierarchy();
-		mSkeleton->PrintHierarchy();
 	}
 
 	Model::~Model()
@@ -165,6 +164,8 @@ namespace hyperion
 				assert(0);
 			}
 		}
+
+		mAsyncImageResources.clear();
 	}
 
 	void Model::LoadMeshes(aiScene const* Scene)
@@ -297,7 +298,7 @@ namespace hyperion
 			Buffer* vertexBuffer = BufferVariance::CreateVertex(vertices.data(), sizeof(PhysicallyBasedVertex) * vertices.size());
 			Buffer* indexBuffer = BufferVariance::CreateIndex(indices.data(), sizeof(U32) * indices.size());
 
-			mesh->SetSharedMaterial(material);
+			mesh->SetMaterial(material);
 			mesh->SetVertexBuffer(vertexBuffer);
 			mesh->SetIndexBuffer(indexBuffer);
 
@@ -340,6 +341,21 @@ namespace hyperion
 				char const* boneName = assimpNodeAnimation->mNodeName.C_Str();
 
 				BoneInfo* boneInfo = mSkeleton->FindBone(boneName);
+
+				if (!boneInfo)
+				{
+					aiNode const* assimpNode = AssimpUtility::FindNodeByNameRecursive(Scene->mRootNode, boneName);
+
+					if (assimpNode)
+					{
+						char const* parentBoneName = (assimpNode->mParent) ? assimpNode->mParent->mName.C_Str() : 0;
+
+						R32M4 boneTransform = AssimpUtility::ToGlmMatrix4(assimpNode->mTransformation);
+						//R32M4 boneOffset = AssimpUtility::ToGlmMatrix4(assimpBone->mOffsetMatrix);
+
+						//boneInfo = mSkeleton->CreateBone(boneName, parentBoneName, boneTransform, R32M4{ 1.0F }); // TODO
+					}
+				}
 
 				if (boneInfo)
 				{
@@ -391,8 +407,8 @@ namespace hyperion
 					{
 						aiVectorKey positionKey = assimpNodeAnimation->mPositionKeys[keyIndex];
 
-						R32 time = (R32)positionKey.mTime;
 						R32V3 position = AssimpUtility::ToGlmVector3(positionKey.mValue);
+						R32 time = (R32)positionKey.mTime;
 
 						positionKeyFrames[positionKeyFrameOffset + keyIndex] = KeyFramePosition{ position, time };
 					}
@@ -401,20 +417,20 @@ namespace hyperion
 					{
 						aiQuatKey rotationKey = assimpNodeAnimation->mRotationKeys[keyIndex];
 
+						R32V4 rotation = R32V4{ -rotationKey.mValue.x, -rotationKey.mValue.y, -rotationKey.mValue.z, rotationKey.mValue.w };
 						R32 time = (R32)rotationKey.mTime;
-						R32Q rotation = AssimpUtility::ToGlmQuaternion(rotationKey.mValue);
 
-						rotationKeyFrames[rotationKeyFrameOffset] = KeyFrameRotation{ rotation, time, 0, 0, 0 };
+						rotationKeyFrames[rotationKeyFrameOffset + keyIndex] = KeyFrameRotation{ rotation, time, 0, 0, 0 };
 					}
 
 					for (U32 keyIndex = 0; keyIndex < scaleKeyFrameCount; ++keyIndex)
 					{
 						aiVectorKey scaleKey = assimpNodeAnimation->mScalingKeys[keyIndex];
 
-						R32 time = (R32)scaleKey.mTime;
 						R32V3 scale = AssimpUtility::ToGlmVector3(scaleKey.mValue);
+						R32 time = (R32)scaleKey.mTime;
 
-						scaleKeyFrames[scaleKeyFrameOffset] = KeyFrameScale{ scale, time };
+						scaleKeyFrames[scaleKeyFrameOffset + keyIndex] = KeyFrameScale{ scale, time };
 					}
 
 					validBoneChannelIndex++;

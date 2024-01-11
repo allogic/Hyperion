@@ -10,11 +10,6 @@
 
 namespace hyperion
 {
-	struct AnimationInfo
-	{
-		R32 Time;
-	};
-
 	struct BoneChannelView
 	{
 		U32 Offset;
@@ -29,7 +24,7 @@ namespace hyperion
 
 	struct KeyFrameRotation
 	{
-		R32Q Rotation;
+		R32V4 Rotation;
 		R32 Time;
 		U32 Reserved0;
 		U32 Reserved1;
@@ -48,7 +43,6 @@ namespace hyperion
 
 		inline auto GetDuration() const { return mDuration; }
 		inline auto GetTicksPerSecond() const { return mTicksPerSecond; }
-		inline auto GetAnimationInfoBuffer() const { return mAnimationInfoBuffer; }
 		inline auto GetPositionBoneChannelViewBuffer() const { return mPositionBoneChannelViewBuffer; }
 		inline auto GetRotationBoneChannelViewBuffer() const { return mRotationBoneChannelViewBuffer; }
 		inline auto GetScaleBoneChannelViewBuffer() const { return mScaleBoneChannelViewBuffer; }
@@ -69,8 +63,6 @@ namespace hyperion
 		R32 mTicksPerSecond = 0.0F;
 
 	private:
-
-		Buffer* mAnimationInfoBuffer = 0;
 
 		Buffer* mPositionBoneChannelViewBuffer = 0;
 		Buffer* mRotationBoneChannelViewBuffer = 0;

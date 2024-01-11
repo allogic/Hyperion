@@ -2,6 +2,8 @@
 #include <Engine/Animation/BoneInfo.h>
 #include <Engine/Animation/Skeleton.h>
 
+#include <Engine/Ecs/Components/AnimatorComponent.h>
+
 namespace hyperion
 {
 	Skeleton::Skeleton()
@@ -29,7 +31,7 @@ namespace hyperion
 			bone->ChannelViewIndex = 0;
 			bone->Allocated = 1;
 			bone->ParentIndex = -1;
-			bone->ParentTransform = R32M4{ 1.0F };
+			bone->BoneTransform = R32M4{ 1.0F };
 			bone->OffsetTransform = Offset;
 			bone->LocalTransform = Transform;
 			bone->WorldTransform = R32M4{ 1.0F };
@@ -56,9 +58,20 @@ namespace hyperion
 		}
 	}
 
-	void Skeleton::SetAnimation(Animation* Animation)
+	void Skeleton::AddAnimation(AnimatorComponent* AnimatorComponent, Animation* Animation)
 	{
-		mBoneHierarchy.UpdateDescriptorSet(Animation);
+		// TODO: Create class for keeping logical indices together
+
+		mAnimationSampler.emplace(AnimatorComponent, Animation);
+
+		U32 descriptorIndex = mBoneHierarchy.AddDescriptorSet();
+
+		mBoneHierarchy.UpdateDescriptorSet(descriptorIndex, AnimatorComponent, Animation);
+	}
+
+	Buffer* Skeleton::CopyBoneBuffer()
+	{
+		return mBoneHierarchy.CopyBoneBuffer();
 	}
 
 	void Skeleton::BuildBoneHierarchy()
@@ -93,11 +106,25 @@ namespace hyperion
 
 	void Skeleton::DispatchBoneHierarchy()
 	{
-		mBoneHierarchy.Dispatch();
+		U32 descriptorIndex = 0;
+
+		for (auto const& [animatorComponent, animation] : mAnimationSampler)
+		{
+			mBoneHierarchy.Dispatch(descriptorIndex, animatorComponent);
+
+			descriptorIndex++;
+		}
 	}
 
 	void Skeleton::PrintHierarchy()
 	{
 		mRootBoneInfo->PrintHierarchy();
+	}
+
+	void Skeleton::DrawHierarchy(U32 Color)
+	{
+		R32M4 worldTransform = R32M4{ 1.0F };
+
+		mRootBoneInfo->DrawHierarchy(worldTransform, Color);
 	}
 }

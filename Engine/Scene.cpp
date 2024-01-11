@@ -37,31 +37,39 @@ namespace hyperion
 		return false;
 	}
 
-	Entity* Scene::CreateEntityFromModel(Model* Model)
+	void Scene::AddModel(Model* Model)
 	{
-		Entity* modelEntity = CreateEntity<Entity>(Model->GetName());
+		mModels[Model->GetName()] = Model;
+	}
 
-		Skeleton* skeleton = Model->GetSkeleton();
+	Entity* Scene::CreateEntityFromModel(std::string const& Name)
+	{
+		Model* model = mModels[Name];
 
-		AnimatorComponent* animatorComponent = modelEntity->AttachComponent<AnimatorComponent>();
-
-		animatorComponent->SetSharedSkeleton(skeleton);
-
-		Entity* meshEntity = modelEntity;
-
-		for (auto const& [name, mesh] : Model->GetMeshes())
+		if (model)
 		{
-			meshEntity = CreateEntity<Entity>(name, meshEntity);
+			Entity* modelEntity = CreateEntity<Entity>(model->GetName());
 
-			RenderComponent* renderComponent = meshEntity->AttachComponent<RenderComponent>();
+			AnimatorComponent* animatorComponent = modelEntity->AttachComponent<AnimatorComponent>(model);
 
-			renderComponent->SetSharedMaterial(mesh->GetSharedMaterial());
-			renderComponent->SetSharedBoneBuffer(skeleton->GetBuffer());
-			renderComponent->SetSharedVertexBuffer(mesh->GetVertexBuffer());
-			renderComponent->SetSharedIndexBuffer(mesh->GetIndexBuffer());
+			Entity* meshEntity = modelEntity;
+
+			for (auto const& [name, mesh] : model->GetMeshes())
+			{
+				meshEntity = CreateEntity<Entity>(name, meshEntity);
+
+				RenderComponent* renderComponent = meshEntity->AttachComponent<RenderComponent>();
+
+				renderComponent->SetSharedMaterial(mesh->GetMaterial());
+				renderComponent->SetSharedBoneBuffer(animatorComponent->GetBoneBuffer());
+				renderComponent->SetSharedVertexBuffer(mesh->GetVertexBuffer());
+				renderComponent->SetSharedIndexBuffer(mesh->GetIndexBuffer());
+			}
+
+			return modelEntity;
 		}
 
-		return modelEntity;
+		return 0;
 	}
 
 	void Scene::DestroyEntity(Entity* Entity)
@@ -110,7 +118,7 @@ namespace hyperion
 
 		for (U32 i = 0; i < entitiesToBeRenderedCount; ++i)
 		{
-			gRenderer->UpdatePhysicallyBasedDescriptorSets(i, mEntitiesToBeRendered[i]);
+			gRenderer->UpdatePhysicallyBasedDescriptorSets(i, this, mEntitiesToBeRendered[i]);
 		}
 	}
 

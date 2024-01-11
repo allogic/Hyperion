@@ -15,6 +15,10 @@ namespace hyperion
 	{
 	public:
 
+		inline auto GetTransformBuffer() const { return mTransformBuffer; }
+
+	public:
+
 		TransformHierarchy();
 		virtual ~TransformHierarchy();
 

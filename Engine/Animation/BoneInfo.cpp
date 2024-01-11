@@ -3,6 +3,8 @@
 
 #include <Engine/Common/Macros.h>
 
+#include <Engine/Renderer/Renderer.h>
+
 namespace hyperion
 {
 	BoneInfo::BoneInfo(BoneInfoArguments const& Arguments)
@@ -65,6 +67,23 @@ namespace hyperion
 		if (!mParent)
 		{
 			LOG("\n");
+		}
+	}
+
+	void BoneInfo::DrawHierarchy(R32M4 const& WorldTransform, U32 Color)
+	{
+		Bone* bone = mAccessor->GetData<Bone>();
+
+		R32M4 worldTransform = WorldTransform * bone->LocalTransform;
+
+		R32V3 parentPosition = WorldTransform[3];
+		R32V3 position = worldTransform[3];
+
+		Renderer::DrawDebugLine(parentPosition, position, Color);
+
+		for (auto const& child : mChildren)
+		{
+			child->DrawHierarchy(worldTransform, Color);
 		}
 	}
 }

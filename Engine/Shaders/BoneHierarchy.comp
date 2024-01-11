@@ -17,7 +17,7 @@ struct Bone
 	uint allocated;
 	int parentIndex;
 	uint reserved0;
-	mat4 parentTransform;
+	mat4 boneTransform;
 	mat4 offsetTransform;
 	mat4 localTransform;
 	mat4 worldTransform;
@@ -50,53 +50,53 @@ struct KeyFrameScale
 	float time;
 };
 
+layout(push_constant) uniform AnimatorState
+{
+	float time;
+} animatorState;
+
 layout(binding = 0) uniform TimeInfo
 {
 	float time;
 	float deltaTime;
 } timeInfo;
 
-layout(binding = 1) uniform AnimationInfo
-{
-	float time;
-} animationInfo;
-
-layout(binding = 2) buffer BoneBuffer
+layout(binding = 1) buffer BoneBuffer
 {
 	Bone bones[];
 } boneBuffer;
 
-layout(binding = 3) buffer PositionBoneChannelViewBuffer
+layout(binding = 2) buffer PositionBoneChannelViewBuffer
 {
 	BoneChannelView views[];
 } positionBoneChannelViewBuffer;
 
-layout(binding = 4) buffer RotationBoneChannelViewBuffer
+layout(binding = 3) buffer RotationBoneChannelViewBuffer
 {
 	BoneChannelView views[];
 } rotationBoneChannelViewBuffer;
 
-layout(binding = 5) buffer ScaleBoneChannelViewBuffer
+layout(binding = 4) buffer ScaleBoneChannelViewBuffer
 {
 	BoneChannelView views[];
 } scaleBoneChannelViewBuffer;
 
-layout(binding = 6) buffer PositionKeyFrameBuffer
+layout(binding = 5) buffer PositionKeyFrameBuffer
 {
 	KeyFramePosition keys[];
 } positionKeyFrameBuffer;
 
-layout(binding = 7) buffer RotationKeyFrameBuffer
+layout(binding = 6) buffer RotationKeyFrameBuffer
 {
 	KeyFrameRotation keys[];
 } rotationKeyFrameBuffer;
 
-layout(binding = 8) buffer ScaleKeyFrameBuffer
+layout(binding = 7) buffer ScaleKeyFrameBuffer
 {
 	KeyFrameScale keys[];
 } scaleKeyFrameBuffer;
 
-layout (local_size_x = 32) in;
+layout (local_size_x = 64) in;
 
 mat4 quaternionToMat4(vec4 q)
 {
@@ -133,14 +133,14 @@ vec4 quaternionNormalize(in vec4 q)
 
 vec4 quaternionSlerp(in vec4 q0, in vec4 q1, in float t)
 {
-	float d = dot(q0, q1);
-
 	q0 = quaternionNormalize(q0);
 	q1 = quaternionNormalize(q1);
 
+	float d = dot(q0, q1);
+
 	if (d < 0.0)
 	{
-		q0 = -q0;
+		q1 = -q1;
 		d = -d;
 	}
 
@@ -255,7 +255,7 @@ mat4 interpolateRotation(in uint boneChannelViewIndex, in float time)
 
 	if (boneChannelView.count == 1)
 	{
-		return quaternionToMat4(boneKeyFrame0.rotation);
+		return quaternionToMat4(quaternionNormalize(boneKeyFrame0.rotation));
 	}
 
 	uint boneKeyFrameIndexA = getRotationIndex(boneChannelView, time);
@@ -267,7 +267,7 @@ mat4 interpolateRotation(in uint boneChannelViewIndex, in float time)
 	float scaleFactor = getScaleFactor(boneKeyFrameA.time, boneKeyFrameB.time, time);
 	vec4 rotation = quaternionSlerp(boneKeyFrameA.rotation, boneKeyFrameB.rotation, scaleFactor);
 
-	return quaternionToMat4(rotation);
+	return quaternionToMat4(quaternionNormalize(rotation));
 }
 
 mat4 interpolateScale(in uint boneChannelViewIndex, in float time)
@@ -314,7 +314,7 @@ void main()
 	{
 		if (bone.parentIndex == -1)
 		{
-			boneBuffer.bones[boneIndex].parentTransform = mat4(1.0); // TODO
+			boneBuffer.bones[boneIndex].boneTransform = mat4(1.0); // TODO
 			boneBuffer.bones[boneIndex].worldTransform = mat4(1.0); // TODO
 		}
 		else
@@ -322,15 +322,15 @@ void main()
 			Bone parentBone = boneBuffer.bones[bone.parentIndex];
 
 			uint channelIndex = bone.channelViewIndex;
-			float animationTime = animationInfo.time;
+			float animationTime = animatorState.time;
 
 			mat4 position = interpolatePosition(channelIndex, animationTime);
 			mat4 rotation = interpolateRotation(channelIndex, animationTime);
 			mat4 scale = interpolateScale(channelIndex, animationTime);
 
-			mat4 worldTransform = parentBone.worldTransform * position * scale;
+			mat4 worldTransform = parentBone.worldTransform * position * rotation * scale;
 
-			boneBuffer.bones[boneIndex].parentTransform = worldTransform * bone.offsetTransform;
+			boneBuffer.bones[boneIndex].boneTransform = worldTransform * bone.offsetTransform;
 			boneBuffer.bones[boneIndex].worldTransform = worldTransform;
 		}
 	}

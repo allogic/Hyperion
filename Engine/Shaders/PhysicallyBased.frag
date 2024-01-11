@@ -21,12 +21,12 @@ layout(location = 17) in vec3 inputTexCoordChannel5;
 layout(location = 18) in vec3 inputTexCoordChannel6;
 layout(location = 19) in vec3 inputTexCoordChannel7;
 
-layout(binding = 3) uniform sampler2D textureBaseColorSampler;
-layout(binding = 4) uniform sampler2D textureNormalCameraSampler;
-layout(binding = 5) uniform sampler2D textureEmissionColorSampler;
-layout(binding = 6) uniform sampler2D textureMetallnessSampler;
-layout(binding = 7) uniform sampler2D textureDiffuseRoughnessSampler;
-layout(binding = 8) uniform sampler2D textureAmbientOcclusionSampler;
+layout(binding = 4) uniform sampler2D textureBaseColorSampler;
+layout(binding = 5) uniform sampler2D textureNormalCameraSampler;
+layout(binding = 6) uniform sampler2D textureEmissionColorSampler;
+layout(binding = 7) uniform sampler2D textureMetallnessSampler;
+layout(binding = 8) uniform sampler2D textureDiffuseRoughnessSampler;
+layout(binding = 9) uniform sampler2D textureAmbientOcclusionSampler;
 
 layout(location = 0) out vec4 outputColor;
 

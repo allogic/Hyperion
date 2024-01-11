@@ -1,3 +1,4 @@
+#include <Engine/Common/Config.h>
 #include <Engine/Common/Macros.h>
 
 #include <Engine/Ecs/Transform.h>
@@ -19,8 +20,8 @@ namespace hyperion
 {
 	TransformHierarchy::TransformHierarchy()
 	{
-		mTransformBuffer = BufferVariance::CreateStorageCoherent(sizeof(FixedSizeBlock) * sizeof(Transform) * 1024);
-		mTransformAllocator = new FixedSizeAllocator{ mTransformBuffer->GetMappedData<U8>(), 1024, sizeof(Transform) };
+		mTransformBuffer = BufferVariance::CreateStorageCoherent(sizeof(FixedSizeBlock) * sizeof(Transform) * MAX_TRANSFORMS);
+		mTransformAllocator = new FixedSizeAllocator{ mTransformBuffer->GetMappedData<U8>(), MAX_TRANSFORMS, sizeof(Transform) };
 
 		mDescriptorPool = Pipeline::CreateDescriptorPool(1, mDescriptorSetLayoutBindings);
 		mDescriptorSetLayout = Pipeline::CreateDescriptorSetLayout(mDescriptorSetLayoutBindings);
@@ -90,6 +91,6 @@ namespace hyperion
 
 		//vkCmdPushConstants(gRenderer->GetComputeCommandBuffer(), mTransformPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(PerEntityData), &perEntityData);
 
-		vkCmdDispatch(gRenderer->GetComputeCommandBuffer(), 1024 / 32, 1, 1);
+		vkCmdDispatch(gRenderer->GetComputeCommandBuffer(), MAX_TRANSFORMS / TRANSFORM_HIERARCHY_WORK_GROUP_SIZE, 1, 1);
 	}
 }

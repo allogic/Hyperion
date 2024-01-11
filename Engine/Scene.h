@@ -21,12 +21,14 @@ namespace hyperion
 	{
 	public:
 
+		inline auto const& GetModels() const { return mModels; }
 		inline auto GetRootEntity() const { return mRootEntity; }
 		inline auto const& GetEntities() const { return mEntities; }
 		inline auto const& GetEntitiesToBeAnimated() const { return mEntitiesToBeAnimated; }
 		inline auto const& GetEntitiesToBeComputed() const { return mEntitiesToBeComputed; }
 		inline auto const& GetEntitiesToBeRendered() const { return mEntitiesToBeRendered; }
 		inline auto GetPlayer() const { return mPlayerEntity; }
+		inline auto GetTransformBuffer() const { return mTransformHierarchy.GetTransformBuffer(); }
 
 	public:
 
@@ -40,10 +42,14 @@ namespace hyperion
 
 	public:
 
+		void AddModel(Model* Model);
+
+	public:
+
 		template<typename E, typename ... Argument>
 		E* CreateEntity(std::string const& Name, Entity* Parent = 0, Argument&&... Arg);
 
-		Entity* CreateEntityFromModel(Model* Model);
+		Entity* CreateEntityFromModel(std::string const& Name);
 
 		void DestroyEntity(Entity* Entity);
 
@@ -59,6 +65,10 @@ namespace hyperion
 
 		void Commit();
 		void Update();
+
+	private:
+
+		std::map<std::string, Model*> mModels = {};
 
 	private:
 

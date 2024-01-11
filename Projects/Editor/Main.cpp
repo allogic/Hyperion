@@ -1,7 +1,10 @@
 #include <Engine/Scene.h>
 
+#include <Engine/Animation/Skeleton.h>
+
 #include <Engine/Common/Config.h>
 #include <Engine/Common/Macros.h>
+#include <Engine/Common/Random.h>
 #include <Engine/Common/Types.h>
 
 #include <Engine/Ecs/Entity.h>
@@ -42,20 +45,13 @@ I32 main()
 
 	Model* model = Model::Load(ROOT_PATH "Projects\\Editor\\Models\\Chaman\\Chaman.glb");
 
-	auto animations = model->GetAnimations(); // TODO: Refactor this!
-
 	model->PrintStats();
 
 	Scene* scene = new Scene;
 
-	Entity* modelEntity = scene->CreateEntityFromModel(model);
+	scene->AddModel(model);
 
-	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Take 001"]);
-	modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Walk_Cycle"]);
-	//modelEntity->GetComponent<AnimatorComponent>()->Play(animations["Attack"]);
-
-	scene->Commit();
-
+	/*
 	{
 		U32 n = 1;
 
@@ -83,19 +79,27 @@ I32 main()
 			}
 		}
 	}
+	*/
 
+	for (U32 i = 0; i < 1024; ++i)
+	{
+		Entity* entity = scene->CreateEntityFromModel("Chaman");
+
+		Transform* transform = entity->GetTransform();
+
+		transform->LocalPosition = R32V3{ Random::NextRealBetween(-10.0F, 10.0F), 0.0F, Random::NextRealBetween(-10.0F, 10.0F) };
+
+		AnimatorComponent* animatorComponent = entity->GetComponent<AnimatorComponent>();
+
+		animatorComponent->Play("Walk_Cycle");
+	}
+
+	scene->Commit();
 	scene->PrintHierarchy();
 
 	while (!Window::ShouldClose())
 	{
 		Window::MeasureTime();
-
-		Renderer::DrawText(R32V3{ 100.0F, 400.0F, 0.5F }, "Sagan", "Hyperion Engine", 2.0F, 0xFFFFFFFF);
-		Renderer::DrawText(R32V3{ 100.0F, 300.0F, 0.5F }, "ProggyClean", "- GPU Entity Component System", 2.0F, 0xFFFFFFFF);
-		Renderer::DrawText(R32V3{ 100.0F, 250.0F, 0.5F }, "ProggyClean", "- Intermediate XML Interface", 2.0F, 0xFFFFFFFF);
-		Renderer::DrawText(R32V3{ 100.0F, 200.0F, 0.5F }, "ProggyClean", "- Smart Font Texture Atlas", 2.0F, 0xFFFFFFFF);
-
-		//Renderer::DrawDebugSkeleton(model->GetSkeleton());
 
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 1.0F, 0.0F, 0.0F }, 0xFF0000FF);
 		Renderer::DrawDebugLine(R32V3{ 0.0F, 0.0F, 0.0F }, R32V3{ 0.0F, 1.0F, 0.0F }, 0x00FF00FF);

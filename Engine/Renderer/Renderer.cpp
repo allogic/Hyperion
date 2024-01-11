@@ -1,5 +1,6 @@
 #include <Engine/Animation/Skeleton.h>
 
+#include <Engine/Common/Config.h>
 #include <Engine/Common/Macros.h>
 #include <Engine/Common/ValueDatabase.h>
 
@@ -19,6 +20,7 @@
 #include <Engine/Platform/Window.h>
 
 #include <Engine/Renderer/Material.h>
+#include <Engine/Renderer/Model.h>
 #include <Engine/Renderer/Renderer.h>
 
 #include <Engine/Vulkan/Image.h>
@@ -38,12 +40,12 @@ namespace hyperion
 		mScreenInfoBuffer = BufferVariance::CreateUniformCoherent(sizeof(ScreenInfo));
 		mProjectionInfoBuffer = BufferVariance::CreateUniformCoherent(sizeof(ProjectionInfo));
 
-		mTextVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * 65535);
-		mTextIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * 65535 * 3);
-		mInterfaceVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * 65535);
-		mInterfaceIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * 65535 * 3);
-		mDebugVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * 131070);
-		mDebugIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * 131070 * 2);
+		mTextVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * MAX_TEXT_VERTICES);
+		mTextIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * MAX_TEXT_VERTICES * 3);
+		mInterfaceVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * MAX_INTERFACE_VERTICES);
+		mInterfaceIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * MAX_INTERFACE_VERTICES * 3);
+		mDebugVertexBuffer = BufferVariance::CreateVertexCoherent(sizeof(DebugVertex) * MAX_DEBUG_VERTICES);
+		mDebugIndexBuffer = BufferVariance::CreateIndexCoherent(sizeof(U16) * MAX_DEBUG_VERTICES * 2);
 
 		CreateCommandBuffer();
 		CreateSyncObjects();
@@ -54,7 +56,7 @@ namespace hyperion
 		CreateQueryPool();
 #endif
 
-		mPhysicallyBasedDescriptorPool = Pipeline::CreateDescriptorPool(1024, mPhysicallyBasedDescriptorSetLayoutBindings);
+		mPhysicallyBasedDescriptorPool = Pipeline::CreateDescriptorPool(ENTITY_DESCRIPTOR_POOL_SIZE, mPhysicallyBasedDescriptorSetLayoutBindings);
 		mPhysicallyBasedDescriptorSetLayout = Pipeline::CreateDescriptorSetLayout(mPhysicallyBasedDescriptorSetLayoutBindings);
 		mPhysicallyBasedPipelineLayout = Pipeline::CreatePipelineLayout(mPhysicallyBasedDescriptorSetLayout, mPhysicallyBasedPushConstantRanges);
 		mPhysicallyBasedPipeline = Pipeline::CreateGraphicPipeline(mPhysicallyBasedPipelineLayout, mRenderPass, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, mPhysicallyBasedVertexFile, mPhysicallyBasedFragmentFile, mPhysicallyBasedVertexInputBindingDescriptions, mPhysicallyBasedVertexInputAttributeDescriptions);
@@ -386,12 +388,13 @@ namespace hyperion
 		VK_CHECK(vkAllocateDescriptorSets(gWindow->GetDevice(), &descriptorSetAllocateInfo, mDebugDescriptorSets.data()));
 	}
 
-	void Renderer::UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Entity* Entity)
+	void Renderer::UpdatePhysicallyBasedDescriptorSets(U32 DescriptorIndex, Scene* Scene, Entity* Entity)
 	{
 		RenderComponent* renderComponent = Entity->GetComponent<RenderComponent>();
 
 		Material* material = renderComponent->GetSharedMaterial();
 
+		Buffer* transformBuffer = Scene->GetTransformBuffer();
 		Buffer* boneBuffer = renderComponent->GetSharedBoneBuffer();
 
 		Image* baseColorImage = material->GetBaseColorImage();
@@ -411,10 +414,15 @@ namespace hyperion
 		projectionInfoDescriptorBufferInfo.buffer = mProjectionInfoBuffer->GetBuffer();
 		projectionInfoDescriptorBufferInfo.range = mProjectionInfoBuffer->GetSize();
 
-		VkDescriptorBufferInfo boneInfoDescriptorBufferInfo = {};
-		boneInfoDescriptorBufferInfo.offset = 0;
-		boneInfoDescriptorBufferInfo.buffer = boneBuffer->GetBuffer();
-		boneInfoDescriptorBufferInfo.range = boneBuffer->GetSize();
+		VkDescriptorBufferInfo transformDescriptorBufferInfo = {};
+		transformDescriptorBufferInfo.offset = 0;
+		transformDescriptorBufferInfo.buffer = transformBuffer->GetBuffer();
+		transformDescriptorBufferInfo.range = transformBuffer->GetSize();
+
+		VkDescriptorBufferInfo boneDescriptorBufferInfo = {};
+		boneDescriptorBufferInfo.offset = 0;
+		boneDescriptorBufferInfo.buffer = boneBuffer->GetBuffer();
+		boneDescriptorBufferInfo.range = boneBuffer->GetSize();
 
 		VkDescriptorImageInfo baseColorDescriptorImageInfo = {};
 		baseColorDescriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
@@ -479,7 +487,7 @@ namespace hyperion
 		writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		writeDescriptorSets[2].descriptorCount = 1;
 		writeDescriptorSets[2].pImageInfo = 0;
-		writeDescriptorSets[2].pBufferInfo = &boneInfoDescriptorBufferInfo;
+		writeDescriptorSets[2].pBufferInfo = &transformDescriptorBufferInfo;
 		writeDescriptorSets[2].pTexelBufferView = 0;
 
 		writeDescriptorSets[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -487,10 +495,10 @@ namespace hyperion
 		writeDescriptorSets[3].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
 		writeDescriptorSets[3].dstBinding = 3;
 		writeDescriptorSets[3].dstArrayElement = 0;
-		writeDescriptorSets[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[3].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		writeDescriptorSets[3].descriptorCount = 1;
-		writeDescriptorSets[3].pImageInfo = &baseColorDescriptorImageInfo;
-		writeDescriptorSets[3].pBufferInfo = 0;
+		writeDescriptorSets[3].pImageInfo = 0;
+		writeDescriptorSets[3].pBufferInfo = &boneDescriptorBufferInfo;
 		writeDescriptorSets[3].pTexelBufferView = 0;
 
 		writeDescriptorSets[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -500,10 +508,10 @@ namespace hyperion
 		writeDescriptorSets[4].dstArrayElement = 0;
 		writeDescriptorSets[4].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSets[4].descriptorCount = 1;
-		writeDescriptorSets[4].pImageInfo = &normalCameraDescriptorImageInfo;
+		writeDescriptorSets[4].pImageInfo = &baseColorDescriptorImageInfo;
 		writeDescriptorSets[4].pBufferInfo = 0;
 		writeDescriptorSets[4].pTexelBufferView = 0;
-		
+
 		writeDescriptorSets[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSets[5].pNext = 0;
 		writeDescriptorSets[5].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
@@ -511,10 +519,10 @@ namespace hyperion
 		writeDescriptorSets[5].dstArrayElement = 0;
 		writeDescriptorSets[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSets[5].descriptorCount = 1;
-		writeDescriptorSets[5].pImageInfo = &emissionColorDescriptorImageInfo;
+		writeDescriptorSets[5].pImageInfo = &normalCameraDescriptorImageInfo;
 		writeDescriptorSets[5].pBufferInfo = 0;
 		writeDescriptorSets[5].pTexelBufferView = 0;
-
+		
 		writeDescriptorSets[6].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSets[6].pNext = 0;
 		writeDescriptorSets[6].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
@@ -522,10 +530,10 @@ namespace hyperion
 		writeDescriptorSets[6].dstArrayElement = 0;
 		writeDescriptorSets[6].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSets[6].descriptorCount = 1;
-		writeDescriptorSets[6].pImageInfo = &metallnessDescriptorImageInfo;
+		writeDescriptorSets[6].pImageInfo = &emissionColorDescriptorImageInfo;
 		writeDescriptorSets[6].pBufferInfo = 0;
 		writeDescriptorSets[6].pTexelBufferView = 0;
-		
+
 		writeDescriptorSets[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSets[7].pNext = 0;
 		writeDescriptorSets[7].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
@@ -533,10 +541,10 @@ namespace hyperion
 		writeDescriptorSets[7].dstArrayElement = 0;
 		writeDescriptorSets[7].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSets[7].descriptorCount = 1;
-		writeDescriptorSets[7].pImageInfo = &diffuseRoughnessDescriptorImageInfo;
+		writeDescriptorSets[7].pImageInfo = &metallnessDescriptorImageInfo;
 		writeDescriptorSets[7].pBufferInfo = 0;
 		writeDescriptorSets[7].pTexelBufferView = 0;
-
+		
 		writeDescriptorSets[8].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeDescriptorSets[8].pNext = 0;
 		writeDescriptorSets[8].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
@@ -544,9 +552,20 @@ namespace hyperion
 		writeDescriptorSets[8].dstArrayElement = 0;
 		writeDescriptorSets[8].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeDescriptorSets[8].descriptorCount = 1;
-		writeDescriptorSets[8].pImageInfo = &ambientOcclusionDescriptorImageInfo;
+		writeDescriptorSets[8].pImageInfo = &diffuseRoughnessDescriptorImageInfo;
 		writeDescriptorSets[8].pBufferInfo = 0;
 		writeDescriptorSets[8].pTexelBufferView = 0;
+
+		writeDescriptorSets[9].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeDescriptorSets[9].pNext = 0;
+		writeDescriptorSets[9].dstSet = mPhysicallyBasedDescriptorSets[DescriptorIndex];
+		writeDescriptorSets[9].dstBinding = 9;
+		writeDescriptorSets[9].dstArrayElement = 0;
+		writeDescriptorSets[9].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeDescriptorSets[9].descriptorCount = 1;
+		writeDescriptorSets[9].pImageInfo = &ambientOcclusionDescriptorImageInfo;
+		writeDescriptorSets[9].pBufferInfo = 0;
+		writeDescriptorSets[9].pTexelBufferView = 0;
 
 		vkUpdateDescriptorSets(gWindow->GetDevice(), (U32)writeDescriptorSets.size(), writeDescriptorSets.data(), 0, 0);
 	}
@@ -799,7 +818,11 @@ namespace hyperion
 						vkCmdBindVertexBuffers(mGraphicCommandBuffer, PhysicallyBasedVertexBindingId, 1, defaultVertexBuffers.data(), defaultOffsets.data());
 						vkCmdBindIndexBuffer(mGraphicCommandBuffer, sharedIndexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-						//vkCmdPushConstants(mGraphicCommandBuffer, mPhysicallyBasedPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PerEntityData), &perEntityData);
+						static PerEntityData perEntityData = {};
+
+						perEntityData.TransformIndex = entities[i]->GetTransformIndex();
+
+						vkCmdPushConstants(mGraphicCommandBuffer, mPhysicallyBasedPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PerEntityData), &perEntityData);
 
 						U32 indexCount = (U32)(sharedIndexBuffer->GetSize() / sizeof(U32));
 
@@ -882,13 +905,9 @@ namespace hyperion
 		{
 			Scene->DispatchTransformHierarchy();
 
-			auto const& entities = Scene->GetEntitiesToBeAnimated();
-
-			for (U32 i = 0; i < entities.size(); ++i)
+			for (auto const& [name, model] : Scene->GetModels())
 			{
-				AnimatorComponent* animatorComponent = entities[i]->GetComponent<AnimatorComponent>();
-
-				Skeleton* skeleton = animatorComponent->GetSharedSkeleton();
+				Skeleton* skeleton = model->GetSkeleton();
 
 				skeleton->DispatchBoneHierarchy();
 			}
@@ -1421,13 +1440,5 @@ namespace hyperion
 
 		gRenderer->mDebugVertexCount += 8;
 		gRenderer->mDebugIndexCount += 24;
-	}
-
-	void Renderer::DrawDebugSkeleton(Skeleton* Skeleton)
-	{
-		if (Skeleton)
-		{
-			//Skeleton->DrawHierarchy(); // TODO
-		}
 	}
 }

@@ -1554,6 +1554,12 @@
     <ClInclude Include="Animation\BoneInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Animation\AnimatorState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ecs\PerEntityData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">

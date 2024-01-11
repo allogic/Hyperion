@@ -10,7 +10,7 @@ namespace hyperion
 		U32 Allocated;
 		I32 ParentIndex;
 		U32 Reserved0;
-		R32M4 ParentTransform;
+		R32M4 BoneTransform;
 		R32M4 OffsetTransform;
 		R32M4 LocalTransform;
 		R32M4 WorldTransform;

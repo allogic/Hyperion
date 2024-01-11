@@ -46,6 +46,7 @@ namespace hyperion
 	public:
 
 		void PrintHierarchy(U32 Offset = 0, U32 Indent = 0, U32 Increment = 2);
+		void DrawHierarchy(R32M4 const& WorldTransform, U32 Color);
 
 	private:
 

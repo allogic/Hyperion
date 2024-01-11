@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animation\Animation.h" />
+    <ClInclude Include="Animation\AnimatorState.h" />
     <ClInclude Include="Animation\Bone.h" />
     <ClInclude Include="Animation\BoneHierarchy.h" />
     <ClInclude Include="Animation\BoneInfo.h" />
@@ -237,6 +238,7 @@
     <ClInclude Include="Ecs\Components\CameraComponent.h" />
     <ClInclude Include="Ecs\Components\ComputeComponent.h" />
     <ClInclude Include="Ecs\Components\RenderComponent.h" />
+    <ClInclude Include="Ecs\PerEntityData.h" />
     <ClInclude Include="Forward.h" />
     <ClInclude Include="Ecs\Entity.h" />
     <ClInclude Include="FreeType\freetype\config\ftconfig.h" />

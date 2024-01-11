@@ -13,8 +13,6 @@ namespace hyperion
 		mDuration = Duration;
 		mTicksPerSecond = TicksPerSecond;
 
-		mAnimationInfoBuffer = BufferVariance::CreateUniformCoherent(sizeof(AnimationInfo));
-
 		mPositionBoneChannelViewBuffer = BufferVariance::CreateStorage((void*)PositionBoneChannelView.data(), sizeof(BoneChannelView) * PositionBoneChannelView.size());
 		mRotationBoneChannelViewBuffer = BufferVariance::CreateStorage((void*)RotationBoneChannelView.data(), sizeof(BoneChannelView) * RotationBoneChannelView.size());
 		mScaleBoneChannelViewBuffer = BufferVariance::CreateStorage((void*)ScaleBoneChannelView.data(), sizeof(BoneChannelView) * ScaleBoneChannelView.size());
@@ -33,7 +31,5 @@ namespace hyperion
 		delete mScaleBoneChannelViewBuffer;
 		delete mRotationBoneChannelViewBuffer;
 		delete mPositionBoneChannelViewBuffer;
-
-		delete mAnimationInfoBuffer;
 	}
 }

@@ -10,6 +10,31 @@ struct FixedSizeBlock
 	uint accessorLow;
 };
 
+struct Transform
+{
+	FixedSizeBlock fixedSizeBlock;
+	vec3 localPosition;
+	uint reserved0;
+	vec3 localEulerAngles;
+	uint reserved1;
+	vec3 localScale;
+	uint reserved2;
+	vec3 localRight;
+	uint reserved3;
+	vec3 localUp;
+	uint reserved4;
+	vec3 localFront;
+	uint reserved5;
+	vec3 worldPosition;
+	uint reserved6;
+	vec4 localRotation;
+	vec4 worldRotation;
+	uint allocated;
+	uint worldSpace;
+	int parentIndex;
+	uint reserved7;
+};
+
 struct Bone
 {
 	FixedSizeBlock fixedSizeBlock;
@@ -17,7 +42,7 @@ struct Bone
 	uint allocated;
 	int parentIndex;
 	uint reserved0;
-	mat4 parentTransform;
+	mat4 boneTransform;
 	mat4 offsetTransform;
 	mat4 localTransform;
 	mat4 worldTransform;
@@ -46,6 +71,11 @@ layout(location = 19) in vec3 vertexTexCoordChannel7;
 layout(location = 20) in ivec4 vertexBoneIndices;
 layout(location = 21) in vec4 vertexBoneWeights;
 
+layout(push_constant) uniform PerEntityData
+{
+	uint transformIndex;
+} perEntityData;
+
 layout(binding = 0) uniform TimeInfo
 {
 	float time;
@@ -58,7 +88,12 @@ layout(binding = 1) uniform ProjectionInfo
 	mat4 projection;
 } projectionInfo;
 
-layout(binding = 2) buffer BoneBuffer
+layout(binding = 2) buffer TransformBuffer
+{
+	Transform transforms[];
+} transformBuffer;
+
+layout(binding = 3) buffer BoneBuffer
 {
 	Bone bones[];
 } boneBuffer;
@@ -96,7 +131,7 @@ void main()
 
 			if (bone.allocated == 1)
 			{
-				vec4 localPosition = bone.parentTransform * vec4(vertexPosition, 1.0);
+				vec4 localPosition = bone.boneTransform * vec4(vertexPosition, 1.0);
 	
 				worldPosition += localPosition * vertexBoneWeights[i];
 
@@ -105,7 +140,17 @@ void main()
 		}
 	}
 
-	worldPosition = projectionInfo.projection * projectionInfo.view * worldPosition;
+	Transform transform = transformBuffer.transforms[perEntityData.transformIndex];
+
+	mat4 model = mat4
+	(
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		transform.worldPosition, 1.0
+	);
+
+	worldPosition = projectionInfo.projection * projectionInfo.view * model * worldPosition;
 
 	outputPosition = vec3(worldPosition);
 	outputNormal = vertexNormal;

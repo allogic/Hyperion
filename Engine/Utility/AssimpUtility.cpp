@@ -40,7 +40,12 @@ namespace hyperion
 
 		for (U32 childIndex = 0; childIndex < Node->mNumChildren; ++childIndex)
 		{
-			FindNodeByNameRecursive(Node->mChildren[childIndex], Name);
+			aiNode const* node = FindNodeByNameRecursive(Node->mChildren[childIndex], Name);
+
+			if (node)
+			{
+				return node;
+			}
 		}
 
 		return 0;

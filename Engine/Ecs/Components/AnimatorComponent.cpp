@@ -1,46 +1,61 @@
 #include <Engine/Animation/Animation.h>
 #include <Engine/Animation/Skeleton.h>
 
+#include <Engine/Common/Random.h>
+
 #include <Engine/Ecs/Components/AnimatorComponent.h>
 
 #include <Engine/Platform/Window.h>
+
+#include <Engine/Renderer/Model.h>
 
 #include <Engine/Vulkan/Buffer.h>
 
 namespace hyperion
 {
-	AnimatorComponent::AnimatorComponent(ComponentArguments const& Arguments) : Component(Arguments)
+	AnimatorComponent::AnimatorComponent(ComponentArguments const& Arguments, Model* Model) : Component(Arguments)
 	{
+		mSharedModel = Model;
+		mSharedSkeleton = mSharedModel->GetSkeleton();
 
+		mBoneBuffer = mSharedSkeleton->CopyBoneBuffer();
 	}
 
 	AnimatorComponent::~AnimatorComponent()
 	{
-
+		delete mBoneBuffer;
 	}
 
-	void AnimatorComponent::Play(Animation* Animation)
+	void AnimatorComponent::Play(std::string const& Name)
 	{
-		mSharedAnimation = Animation;
-		mSharedSkeleton->SetAnimation(Animation);
+		auto const& animations = mSharedModel->GetAnimations();
 
-		mTime = 0.0F;
-		mPlaying = true;
+		auto it = animations.find(Name);
+
+		if (it != animations.end())
+		{
+			Animation* animation = it->second;
+
+			mSharedSkeleton->AddAnimation(this, animation);
+
+			mDuration = animation->GetDuration();
+			mTicksPerSecond = animation->GetTicksPerSecond();
+
+			mTime = Random::NextRealBetween(0.0F, mDuration);
+
+			mPlaying = true;
+		}
 	}
 
 	void AnimatorComponent::Update()
 	{
 		if (mPlaying)
 		{
-			Buffer* animationInfoBuffer = mSharedAnimation->GetAnimationInfoBuffer();
-
-			AnimationInfo* animationInfo = animationInfoBuffer->GetMappedData<AnimationInfo>();
-
-			animationInfo->Time += mSharedAnimation->GetTicksPerSecond() * Window::GetDeltaTime();
+			mTime += mTicksPerSecond * Window::GetDeltaTime();
 			
-			if (animationInfo->Time >= mSharedAnimation->GetDuration())
+			if (mTime >= mDuration)
 			{
-				animationInfo->Time = 0.0F;
+				mTime = 0.0F;
 			}
 		}
 	}

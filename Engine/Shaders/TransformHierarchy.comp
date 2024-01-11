@@ -38,7 +38,7 @@ layout(binding = 0) buffer TransformBuffer
 	Transform transforms[];
 } transformBuffer;
 
-layout (local_size_x = 32) in;
+layout (local_size_x = 256) in;
 
 vec4 multiplyQuaternions(in vec4 q, in vec4 b)
 {
